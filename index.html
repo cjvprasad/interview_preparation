@@ -723,7 +723,7 @@
               throw new Error("Input must be an array");
             const logs = item.dryRunFunc(parsedInput);
             setDynamicLogs(logs);
-            setIsEditing(false);
+            // setIsEditing(false);
           } catch (err) {
             setError("Invalid Format: " + err.message);
           }
