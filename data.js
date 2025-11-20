@@ -163,6 +163,86 @@ function merge(left, right) {
   }
 }`,
   },
+  {
+    id: 6,
+    title: "Bubble Sort",
+    category: "Sorting",
+    algorithm:
+      "Repeatedly compare adjacent elements and swap them if they are in the wrong order. Largest elements bubble to the end after each pass.",
+    timeComplexity: "O(n²)",
+    spaceComplexity: "O(1)",
+    dryRun: [
+      "Input: arr = [5, 3, 8, 4]",
+      "Pass 1: (5,3)->swap => [3,5,8,4], (5,8)->ok, (8,4)->swap => [3,5,4,8]",
+      "Pass 2: (3,5)->ok, (5,4)->swap => [3,4,5,8]",
+      "Pass 3: (3,4)->ok => Sorted",
+    ],
+    edgeCases: [
+      "Already sorted array",
+      "Reverse sorted array",
+      "Array with duplicates",
+    ],
+    tips: [
+      "Best case O(n) when array is already sorted using an optimized flag.",
+      "Used for small datasets where simplicity matters.",
+    ],
+    code: `function bubbleSort(arr) {
+  let n = arr.length;
+  for (let i = 0; i < n - 1; i++) {
+    let swapped = false;
+    for (let j = 0; j < n - i - 1; j++) {
+      if (arr[j] > arr[j + 1]) {
+        let temp = arr[j];
+        arr[j] = arr[j + 1];
+        arr[j + 1] = temp;
+        swapped = true;
+      }
+    }
+    if (!swapped) break; // Optimization
+  }
+  return arr;
+}`,
+  },
+  {
+    id: 7,
+    title: "Selection Sort",
+    category: "Sorting",
+    algorithm:
+      "Find the minimum element from the unsorted part and swap it with the element at the current index.",
+    timeComplexity: "O(n²)",
+    spaceComplexity: "O(1)",
+    dryRun: [
+      "Input: arr = [29, 10, 14, 37, 13]",
+      "i=0 -> min=10 => swap => [10,29,14,37,13]",
+      "i=1 -> min=13 => swap => [10,13,14,37,29]",
+      "i=2 -> min=14 => ok => [10,13,14,37,29]",
+      "i=3 -> min=29 => swap => [10,13,14,29,37]",
+    ],
+    edgeCases: [
+      "Array with identical elements",
+      "Single element array",
+      "Already sorted array",
+    ],
+    tips: [
+      "Always performs the same number of comparisons.",
+      "Faster than Bubble Sort in practice due to fewer swaps.",
+    ],
+    code: `function selectionSort(arr) {
+  let n = arr.length;
+  for (let i = 0; i < n - 1; i++) {
+    let minIdx = i;
+    for (let j = i + 1; j < n; j++) {
+      if (arr[j] < arr[minIdx]) {
+        minIdx = j;
+      }
+    }
+    let temp = arr[i];
+    arr[i] = arr[minIdx];
+    arr[minIdx] = temp;
+  }
+  return arr;
+}`,
+  },
 ];
 
  const reactQuestionsData = [
@@ -1373,4 +1453,5 @@ function merge(left, right) {
       "toString(): 5,20,3,10\njoin(): 5 | 20 | 3 | 10\nconcat(): [5, 20, 3, 10, 1, 2]\nArray.from(): ['a', 'b', 'c']\n// ... (full console output from Q82)",
   },
 ];
+
 
