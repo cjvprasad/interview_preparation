@@ -16,9 +16,7 @@
     />
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-jsx.min.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
     <style>
       @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
@@ -81,6 +79,16 @@
           transform: translateY(0);
         }
       }
+
+      /* Custom Select Arrow */
+      .dark-select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+      }
     </style>
   </head>
   <body>
@@ -91,7 +99,7 @@
       const { useState, useMemo, useEffect } = React;
 
       // =========================================
-      // 1. ICONS (Replacing lucide-react for standalone)
+      // 1. ICONS
       // =========================================
       const IconBase = ({ children, size = 16, className = "" }) => (
         <svg
@@ -179,7 +187,7 @@
       );
 
       // =========================================
-      // 3. UTILS
+      // 2. UTILS
       // =========================================
       const updateURL = (params) => {
         try {
@@ -198,7 +206,7 @@
       };
 
       // =========================================
-      // 4. SHARED COMPONENTS
+      // 3. SHARED COMPONENTS
       // =========================================
 
       const SyntaxHighLighter = ({
@@ -207,75 +215,47 @@
         output = null,
       }) => {
         const [copied, setCopied] = useState(false);
-
         const [isDark, setIsDark] = useState(true);
-
-        // EFFECT: Toggle Prism CSS Theme between Light/Dark
 
         useEffect(() => {
           const themeLink = document.getElementById("prism-theme-link");
-
           if (themeLink) {
             themeLink.href = isDark
-              ? "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" // Dark Theme
-              : "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"; // Light Theme
+              ? "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+              : "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css";
           }
-
-          // Re-run highlighting whenever code or theme changes
-
           if (window.Prism) window.Prism.highlightAll();
         }, [isDark, codeString]);
 
         const handleCopy = async () => {
           try {
             await navigator.clipboard.writeText(codeString || output || "");
-
             setCopied(true);
-
             setTimeout(() => setCopied(false), 1500);
           } catch (err) {
             console.error("Failed to copy:", err);
           }
         };
 
-        // --- STYLES (From your snippet, adapted slightly) ---
-
         const styles = {
           container: {
             position: "relative",
-
             borderRadius: 8,
-
             overflow: "hidden",
-
             fontFamily: "monospace",
-
             marginTop: 10,
-
             marginBottom: 10,
-
             transition: "all 0.3s ease",
-
             border: isDark ? "1px solid #334155" : "1px solid #ccc",
-
-            // FIX: Critical for responsiveness
-
             maxWidth: "100%",
-
             minWidth: 0,
           },
-
           header: {
             display: "flex",
-
             justifyContent: "space-between",
-
             alignItems: "center",
-
             padding: "6px 12px",
-
             fontSize: 13,
-
             borderBottom: isDark ? "1px solid #333" : "1px solid #ddd",
           },
 
@@ -289,21 +269,13 @@
 
           button: {
             background: "transparent",
-
             border: `1px solid ${isDark ? "#666" : "#999"}`,
-
             padding: "2px 8px",
-
             borderRadius: 4,
-
             cursor: "pointer",
-
             fontSize: 12,
-
             marginLeft: 8,
-
             transition: "all 0.2s ease",
-
             color: isDark ? "#fff" : "#333",
           },
         };
@@ -316,8 +288,6 @@
               color: isDark ? "#fff" : "#000",
             }}
           >
-            {/* Header */}
-
             <div
               style={{
                 ...styles.header,
@@ -325,13 +295,19 @@
                 color: isDark ? "#fff" : "#000",
               }}
             >
-              <span style={styles.language}>{language.toUpperCase()}</span>
-
+              <span
+                style={{
+                  opacity: 0.8,
+                  letterSpacing: "0.5px",
+                  fontWeight: "bold",
+                }}
+              >
+                {language.toUpperCase()}
+              </span>
               <div style={{ display: "flex" }}>
                 <button onClick={handleCopy} style={styles.button}>
                   {copied ? "✅ Copied!" : "📋 Copy"}
                 </button>
-
                 <button
                   onClick={() => setIsDark((prev) => !prev)}
                   style={styles.button}
@@ -340,9 +316,6 @@
                 </button>
               </div>
             </div>
-
-            {/* Code Block */}
-
             {codeString && (
               <div
                 style={{ padding: "16px", overflowX: "auto", fontSize: "14px" }}
@@ -352,24 +325,15 @@
                 </pre>
               </div>
             )}
-
-            {/* Output Block */}
-
             {output && (
               <div
                 style={{
                   background: isDark ? "#1e1e1e" : "#fafafa",
-
                   color: isDark ? "#00ff88" : "#333",
-
                   fontFamily: "monospace",
-
                   padding: "12px",
-
                   borderTop: isDark ? "1px solid #444" : "1px solid #ddd",
-
                   fontSize: "12px",
-
                   overflowX: "auto",
                 }}
               >
@@ -382,7 +346,6 @@
                 >
                   Console Output:
                 </strong>
-
                 <pre style={{ margin: 0, whiteSpace: "pre-wrap" }}>
                   {output}
                 </pre>
@@ -438,7 +401,7 @@
       const QuestionCard = ({ id, title, explanation, category, onClick }) => (
         <div
           onClick={onClick}
-          className="group bg-[#1e293b] border border-gray-700 hover:border-blue-500 rounded-xl p-5 cursor-pointer transition-all duration-200 hover:-translate-y-1 shadow-lg card-hover"
+          className="group bg-[#1e293b] border border-gray-700 hover:border-blue-500 rounded-xl p-5 cursor-pointer transition-all duration-200 hover:-translate-y-1 shadow-lg card-hover flex flex-col justify-between"
         >
           <div className="flex justify-between items-start mb-3 ">
             <span className="text-xs font-mono text-blue-400 bg-blue-900/20 px-2 py-1 rounded">
@@ -461,7 +424,7 @@
       );
 
       // =========================================
-      // 5. LOG VIEWER
+      // 4. LOG VIEWER COMPONENTS
       // =========================================
       const LogViewer = ({ logs }) => {
         const groupedLogs = useMemo(() => {
@@ -568,7 +531,7 @@
       };
 
       // =========================================
-      // 6. VIEW COMPONENTS
+      // 5. VIEW COMPONENTS
       // =========================================
       const ReactDetail = ({ question, onBack }) => {
         useEffect(() => {
@@ -582,7 +545,7 @@
             >
               <div className="p-1 rounded-full bg-blue-500/10 group-hover:bg-blue-500/20 transition">
                 <ChevronLeft size={16} />
-              </div>
+              </div>{" "}
               Back to List
             </button>
             <div className="border-b border-slate-700 pb-4 mb-6">
@@ -599,19 +562,19 @@
             </h3>
             <SyntaxHighLighter
               codeString={question.explanation}
-              isExplanation={true}
+              language="text"
             />
             <h3 className="text-lg font-semibold text-white mt-8 mb-2 flex items-center gap-2">
               💡 Interview Tips
             </h3>
-            <SyntaxHighLighter
-              codeString={question.tips}
-              isExplanation={true}
-            />
+            <SyntaxHighLighter codeString={question.tips} language="text" />
             <h3 className="text-lg font-semibold text-white mt-8 mb-2 flex items-center gap-2">
               💻 Code Snippet
             </h3>
-            <SyntaxHighLighter codeString={question.codeString} />
+            <SyntaxHighLighter
+              codeString={question.codeString}
+              language="jsx"
+            />
             {question.output && (
               <>
                 <h3 className="text-lg font-semibold text-white mt-8 mb-2 flex items-center gap-2">
@@ -626,7 +589,16 @@
 
       const ReactView = ({ initialId }) => {
         const [search, setSearch] = useState("");
+        const [category, setCategory] = useState("All");
+        const [sortBy, setSortBy] = useState("id");
+        const [sortOrder, setSortOrder] = useState("asc");
         const [selectedQuestion, setSelectedQuestion] = useState(null);
+
+        // Calculate categories
+        const categories = useMemo(
+          () => ["All", ...new Set(reactQuestionsData.map((q) => q.category))],
+          []
+        );
 
         useEffect(() => {
           if (initialId) {
@@ -641,13 +613,35 @@
           setSelectedQuestion(null);
           updateURL({ id: null });
         };
-        const filteredData = useMemo(
-          () =>
-            reactQuestionsData.filter((q) =>
-              q.title.toLowerCase().includes(search.toLowerCase())
-            ),
-          [search]
-        );
+
+        // Logic for filtering and sorting
+        const filteredData = useMemo(() => {
+          let data = reactQuestionsData.filter((q) => {
+            const matchSearch =
+              q.title.toLowerCase().includes(search.toLowerCase()) ||
+              q.explanation.toLowerCase().includes(search.toLowerCase());
+            const matchCat = category === "All" || q.category === category;
+            return matchSearch && matchCat;
+          });
+
+          return data.sort((a, b) => {
+            let valA = a[sortBy];
+            let valB = b[sortBy];
+            if (typeof valA === "string") valA = valA.toLowerCase();
+            if (typeof valB === "string") valB = valB.toLowerCase();
+
+            if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+            if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+            return 0;
+          });
+        }, [search, category, sortBy, sortOrder]);
+
+        const handleReset = () => {
+          setSearch("");
+          setCategory("All");
+          setSortBy("id");
+          setSortOrder("asc");
+        };
 
         if (selectedQuestion)
           return (
@@ -668,6 +662,8 @@
                 patterns.
               </p>
             </header>
+
+            {/* FILTER BAR */}
             <div className="bg-slate-800/50 p-5 rounded-xl border border-slate-700 shadow-lg mb-6">
               <div className="mb-4 relative">
                 <span className="absolute left-3 top-3 text-slate-500">🔍</span>
@@ -678,15 +674,83 @@
                   className="w-full bg-slate-900 border border-slate-700 text-white py-2 pl-10 pr-4 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-600"
                 />
               </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="flex flex-col">
+                  <label className="text-xs text-slate-500 mb-1 ml-1 font-bold">
+                    Category
+                  </label>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="dark-select w-full bg-slate-900 border border-slate-700 text-white py-2 px-3 rounded-lg text-sm focus:border-blue-500 outline-none"
+                  >
+                    {categories.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-xs text-slate-500 mb-1 ml-1 font-bold">
+                    Sort By
+                  </label>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="dark-select w-full bg-slate-900 border border-slate-700 text-white py-2 px-3 rounded-lg text-sm focus:border-blue-500 outline-none"
+                  >
+                    <option value="id">ID</option>
+                    <option value="title">Title</option>
+                  </select>
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-xs text-slate-500 mb-1 ml-1 font-bold">
+                    Order
+                  </label>
+                  <select
+                    value={sortOrder}
+                    onChange={(e) => setSortOrder(e.target.value)}
+                    className="dark-select w-full bg-slate-900 border border-slate-700 text-white py-2 px-3 rounded-lg text-sm focus:border-blue-500 outline-none"
+                  >
+                    <option value="asc">Ascending</option>
+                    <option value="desc">Descending</option>
+                  </select>
+                </div>
+                <div className="flex items-end">
+                  <button
+                    onClick={handleReset}
+                    className="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 py-2 rounded-lg font-bold text-sm transition border border-slate-600"
+                  >
+                    Reset Filters
+                  </button>
+                </div>
+              </div>
             </div>
+
+            <div className="mb-4 text-xs text-slate-500 font-mono text-right">
+              Showing{" "}
+              <span className="text-blue-400 font-bold">
+                {filteredData.length}
+              </span>{" "}
+              result(s)
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredData.map((q) => (
-                <QuestionCard
-                  key={q.id}
-                  {...q}
-                  onClick={() => setSelectedQuestion(q)}
-                />
-              ))}
+              {filteredData.length > 0 ? (
+                filteredData.map((q) => (
+                  <QuestionCard
+                    key={q.id}
+                    {...q}
+                    onClick={() => setSelectedQuestion(q)}
+                  />
+                ))
+              ) : (
+                <div className="col-span-full text-center p-10 border-2 border-dashed border-slate-800 rounded-xl text-slate-500">
+                  No matching questions found.
+                </div>
+              )}
             </div>
           </div>
         );
@@ -697,15 +761,11 @@
         const [dynamicLogs, setDynamicLogs] = useState(null);
         const [error, setError] = useState(null);
         const [isEditing, setIsEditing] = useState(false);
-
-        console.log(item?.dryRunFunc, "item?.dryRunFunc", item);
-
         const hasImplementation = typeof item?.dryRunFunc === "function";
 
         useEffect(() => {
           updateURL({ id: item.id.toString() });
         }, [item.id]);
-
         useEffect(() => {
           setDynamicLogs(null);
           setError(null);
@@ -723,7 +783,6 @@
               throw new Error("Input must be an array");
             const logs = item.dryRunFunc(parsedInput);
             setDynamicLogs(logs);
-            // setIsEditing(false);
           } catch (err) {
             setError("Invalid Format: " + err.message);
           }
@@ -739,7 +798,7 @@
             >
               <div className="p-1 rounded-full bg-blue-500/10 group-hover:bg-blue-500/20 transition">
                 <ChevronLeft size={16} />
-              </div>
+              </div>{" "}
               Back to List
             </button>
             <div className="border-b border-slate-700 pb-6 mb-6">
@@ -771,7 +830,7 @@
                 <section>
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end mb-3 gap-3">
                     <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                      🏃 Dry Run
+                      🏃 Dry Run{" "}
                       {dynamicLogs && (
                         <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded ml-2">
                           Dynamic
@@ -813,14 +872,13 @@
                       )}
                     </div>
                   ) : (
-                    <>
-                      <input
-                        type="text"
-                        value={inputStr}
-                        onChange={(e) => null}
-                        className="flex-1 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-sm font-mono text-white focus:border-blue-500 outline-none"
-                      />
-                    </>
+                    <input
+                      type="text"
+                      value={inputStr}
+                      readOnly
+                      className="w-full mb-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-sm font-mono text-gray-500 outline-none cursor-default opacity-50"
+                      title="Click 'Edit Input' to change"
+                    />
                   )}
                   <LogViewer logs={logsToDisplay} />
                   {dynamicLogs && (
@@ -890,6 +948,7 @@
           setSelected(null);
           updateURL({ id: null });
         };
+
         const filtered = useMemo(() => {
           return dsaAlgorithms.filter((item) => {
             const matchSearch =
@@ -932,7 +991,7 @@
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="bg-slate-900 border border-slate-700 text-white p-2.5 pr-10 rounded-lg min-w-[150px] focus:border-blue-500 outline-none"
+                  className="dark-select bg-slate-900 border border-slate-700 text-white p-2.5 pr-10 rounded-lg min-w-[150px] focus:border-blue-500 outline-none"
                 >
                   {categories.map((c) => (
                     <option key={c} value={c}>
@@ -978,9 +1037,6 @@
         );
       };
 
-      // =========================================
-      // 7. MAIN APP
-      // =========================================
       const InterviewExplorer = () => {
         const [activeTab, setActiveTab] = useState("dsa");
         const [initialId, setInitialId] = useState(null);
@@ -1036,7 +1092,6 @@
                 </div>
               </div>
             </nav>
-
             <main className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-8">
               {activeTab === "react" ? (
                 <ReactView initialId={initialId} />
@@ -1044,7 +1099,6 @@
                 <DSAView initialId={initialId} />
               )}
             </main>
-
             <footer className="border-t border-slate-800 py-8 mt-auto">
               <div className="max-w-7xl mx-auto px-4 text-center text-slate-500 text-sm">
                 <p>
