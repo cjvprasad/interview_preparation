@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Interview Prep — React + DSA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- ====== Styling ====== -->
+  <style>
+    :root{
+      --accent:#3b82f6;
+      --muted:#6b7280;
+      --bg:#0f172a;
+      --card:#1e293b;
+      --radius:10px;
+      font-family: Inter, sans-serif;
+    }
+
+    body{
+      margin:0;
+      background:#0f172a;
+      color:white;
+      padding:20px;
+    }
+
+    h1{ margin:0 0 10px 0; }
+
+    /* ===== Tabs ===== */
+    .tab-container{
+      display:flex;
+      gap:10px;
+      margin-bottom:20px;
+    }
+
+    .tab{
+      padding:10px 16px;
+      background:#1e293b;
+      border:none;
+      border-radius:var(--radius);
+      cursor:pointer;
+      color:white;
+      font-weight:600;
+    }
+
+    .tab.active{
+      background:var(--accent);
+    }
+
+    .tab-content{
+      display:none;
+    }
+
+    .tab-content.active{
+      display:block;
+    }
+
+    /* ===== DSA Cards ===== */
+    .dsa-card{
+      background:#1e293b;
+      padding:15px;
+      border-radius:var(--radius);
+      margin-bottom:20px;
+      border:1px solid rgba(255,255,255,0.05);
+    }
+
+    .dsa-card h2{
+      margin-top:0;
+      color:#60a5fa;
+    }
+
+    pre{
+      background:#0b1220;
+      padding:10px;
+      border-radius:8px;
+      overflow:auto;
+      color:#e2e8f0;
+    }
+
+    .section-title{
+      margin:20px 0 10px 0;
+      font-size:1.1rem;
+      color:#93c5fd;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>🧠 Interview Preparation — React + DSA</h1>
+
+  <!-- ====== TABS ====== -->
+  <div class="tab-container">
+    <button class="tab active" onclick="switchTab('react')">React Interview</button>
+    <button class="tab" onclick="switchTab('dsa')">DSA Cheatsheet</button>
+  </div>
+
+  <!-- ====== React Interview Tab ====== -->
+  <div id="reactTab" class="tab-content active">
+    <div id="react-root"></div>
+  </div>
+
+  <!-- ====== DSA Tab ====== -->
+  <div id="dsaTab" class="tab-content">
+    <div id="dsa-root"></div>
+  </div>
+
+  <!-- ====== Tab Switching Script ====== -->
+  <script>
+    function switchTab(tab){
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+
+      if(tab === "react"){
+        document.querySelector(".tab:nth-child(1)").classList.add("active");
+        document.getElementById("reactTab").classList.add("active");
+      } 
+      else {
+        document.querySelector(".tab:nth-child(2)").classList.add("active");
+        document.getElementById("dsaTab").classList.add("active");
+      }
+    }
+  </script>
+
+  <!-- ====== Load DSA Data (from external JS file) ====== -->
+  <script type="module">
+    import { dsaAlgorithms } from "./data/dsaAlgorithms.js";
+
+    const root = document.getElementById("dsa-root");
+
+    function renderDSACard(item){
+      return `
+        <div class="dsa-card">
+          <h2>${item.id}. ${item.title}</h2>
+          <p><b>Category:</b> ${item.category}</p>
+          <p><b>Time Complexity:</b> ${item.timeComplexity}</p>
+          <p><b>Space Complexity:</b> ${item.spaceComplexity}</p>
+
+          <div class="section-title">Algorithm</div>
+          <p>${item.algorithm}</p>
+
+          <div class="section-title">Dry Run</div>
+          <ul>
+            ${item.dryRun.map(step => `<li>${step}</li>`).join("")}
+          </ul>
+
+          <div class="section-title">Edge Cases</div>
+          <ul>
+            ${item.edgeCases.map(e => `<li>${e}</li>`).join("")}
+          </ul>
+
+          <div class="section-title">Interview Tips</div>
+          <ul>
+            ${item.tips.map(t => `<li>${t}</li>`).join("")}
+          </ul>
+
+          <div class="section-title">Code</div>
+          <pre><code>${item.code}</code></pre>
+        </div>
+      `;
+    }
+
+    function renderDSA(data){
+      root.innerHTML = data.map(renderDSACard).join("");
+    }
+
+    renderDSA(dsaAlgorithms);
+  </script>
+
+  <!-- ====== Load React App Bundle ====== -->
+  <script src="./app/react-app.js"></script>
+
+</body>
+</html>
