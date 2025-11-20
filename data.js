@@ -163,7 +163,7 @@ function merge(left, right) {
   }
 }`,
   },
-  {
+ {
     id: 6,
     title: "Bubble Sort",
     category: "Sorting",
@@ -172,11 +172,34 @@ function merge(left, right) {
     timeComplexity: "O(n²)",
     spaceComplexity: "O(1)",
     dryRun: [
-      "Input: arr = [5, 3, 8, 4]",
-      "Pass 1: (5,3)->swap => [3,5,8,4], (5,8)->ok, (8,4)->swap => [3,5,4,8]",
-      "Pass 2: (3,5)->ok, (5,4)->swap => [3,4,5,8]",
-      "Pass 3: (3,4)->ok => Sorted",
+      "Pass 1:",
+      "(13,24) -> ok",
+      "(24,46) -> ok",
+      "(46,20) -> swap",
+      "(46,9) -> swap",
+      "(46,52) -> ok",
+      "Result after Pass 1: [13,24,20,9,46,52]",
+      "Pass 2:",
+      "(13,24) -> ok",
+      "(24,20) -> swap",
+      "(24,9) -> swap",
+      "(24,46) -> ok",
+      "Result after Pass 2: [13,20,9,24,46,52]",
+      "Pass 3:",
+      "(13,20) -> ok",
+      "(20,9) -> swap",
+      "(20,24) -> ok",
+      "Result after Pass 3: [13,9,20,24,46,52]",
+      "Pass 4:",
+      "(13,9) -> swap",
+      "(13,20) -> ok",
+      "Result after Pass 4: [9,13,20,24,46,52]",
+      "Pass 5:",
+      "(9,13) -> ok",
+      "Result after Pass 5: [9,13,20,24,46,52]",
+      "Final Sorted Output: [9,13,20,24,46,52]",
     ],
+
     edgeCases: [
       "Already sorted array",
       "Reverse sorted array",
@@ -202,6 +225,45 @@ function merge(left, right) {
   }
   return arr;
 }`,
+    pages: "true",
+    dryRunFunc: (inputArray) => {
+      const logs = [];
+      let arr = [...inputArray]; // Avoid mutating original
+      let n = arr.length;
+      let pass = 1;
+
+      // Helper to push logs (mimicking console.log)
+      const log = (msg, detail = "") => {
+        logs.push(detail ? `${msg} ${detail}` : msg);
+      };
+
+      for (let i = 0; i < n - 1; i++) {
+        log(`Pass ${pass}:`);
+        let swapped = false;
+
+        for (let j = 0; j < n - i - 1; j++) {
+          const left = arr[j];
+          const right = arr[j + 1];
+
+          if (left > right) {
+            log(`(${left},${right}) -> swap`);
+            [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+            swapped = true;
+          } else {
+            log(`(${left},${right}) -> ok`);
+          }
+        }
+
+        log(`Result after Pass ${pass}:`, JSON.stringify(arr));
+
+        pass++;
+        if (!swapped) break;
+      }
+
+      log("Final Sorted Output:", JSON.stringify(arr));
+      return logs;
+    },
+    input: "[13, 24, 46, 20, 9, 52]",
   },
   {
     id: 7,
@@ -212,11 +274,34 @@ function merge(left, right) {
     timeComplexity: "O(n²)",
     spaceComplexity: "O(1)",
     dryRun: [
-      "Input: arr = [29, 10, 14, 37, 13]",
-      "i=0 -> min=10 => swap => [10,29,14,37,13]",
-      "i=1 -> min=13 => swap => [10,13,14,37,29]",
-      "i=2 -> min=14 => ok => [10,13,14,37,29]",
-      "i=3 -> min=29 => swap => [10,13,14,29,37]",
+      "Pass 1:",
+      "  Current val: 13 and . Searching for smaller...",
+      "  ➜ Found new min: 9 (at idx 5) < 13",
+      "  SWAP: 13 ⇄ 9",
+      "  Result after Pass 1: [9,46,24,52,20,13]",
+      "Pass 2:",
+      "  Current val: 46 and . Searching for smaller...",
+      "  ➜ Found new min: 24 (at idx 2) < 46",
+      "  ➜ Found new min: 20 (at idx 4) < 24",
+      "  ➜ Found new min: 13 (at idx 5) < 20",
+      "  SWAP: 46 ⇄ 13",
+      "  Result after Pass 2: [9,13,24,52,20,46]",
+      "Pass 3:",
+      "  Current val: 24 and . Searching for smaller...",
+      "  ➜ Found new min: 20 (at idx 4) < 24",
+      "  SWAP: 24 ⇄ 20",
+      "  Result after Pass 3: [9,13,20,52,24,46]",
+      "Pass 4:",
+      "  Current val: 52 and . Searching for smaller...",
+      "  ➜ Found new min: 24 (at idx 4) < 52",
+      "  SWAP: 52 ⇄ 24",
+      "  Result after Pass 4: [9,13,20,24,52,46]",
+      "Pass 5:",
+      "  Current val: 52 and . Searching for smaller...",
+      "  ➜ Found new min: 46 (at idx 5) < 52",
+      "  SWAP: 52 ⇄ 46",
+      "  Result after Pass 5: [9,13,20,24,46,52]",
+      "Final Sorted Output: [9,13,20,24,46,52]",
     ],
     edgeCases: [
       "Array with identical elements",
@@ -242,6 +327,43 @@ function merge(left, right) {
   }
   return arr;
 }`,
+    dryRunFunc: (inputArray) => {
+      const logs = [];
+      let arr = [...inputArray]; // Avoid mutating original
+      let n = arr.length;
+
+      // Helper to push logs
+      const log = (msg) => logs.push(msg);
+
+      for (let i = 0; i < n - 1; i++) {
+        log(`Pass ${i + 1}:`);
+        let minIdx = i;
+
+        log(`  Current val: ${arr[i]} and . Searching for smaller...`);
+
+        for (let j = i + 1; j < n; j++) {
+          if (arr[j] < arr[minIdx]) {
+            log(`  ➜ Found new min: ${arr[j]} (at idx ${j}) < ${arr[minIdx]}`);
+            minIdx = j;
+          }
+        }
+
+        if (minIdx !== i) {
+          log(`  SWAP: ${arr[i]} ⇄ ${arr[minIdx]}`);
+          let temp = arr[i];
+          arr[i] = arr[minIdx];
+          arr[minIdx] = temp;
+        } else {
+          log(`  NO SWAP: ${arr[i]} is already the smallest remaining.`);
+        }
+
+        log(`  Result after Pass ${i + 1}: ${JSON.stringify(arr)}`);
+      }
+
+      log(`Final Sorted Output: ${JSON.stringify(arr)}`);
+      return logs;
+    },
+    input: "[13,46,24,52,20,9]",
   },
 ];
 
@@ -1453,5 +1575,6 @@ function merge(left, right) {
       "toString(): 5,20,3,10\njoin(): 5 | 20 | 3 | 10\nconcat(): [5, 20, 3, 10, 1, 2]\nArray.from(): ['a', 'b', 'c']\n// ... (full console output from Q82)",
   },
 ];
+
 
 
