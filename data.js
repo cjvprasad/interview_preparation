@@ -2096,7 +2096,442 @@ function merge(arr, low, mid, high) {
       "  Result after Pass 8: [1,1,2,2,3,4,4,5,6]",
       "Final Sorted Output: [1,1,2,2,3,4,4,5,6]",
     ],
+  },{
+    id: 7,
+    title: "Quick Sort (First Element Pivot)",
+    category: "Sorting",
+    algorithm:
+      "Select the first element as pivot, partition the array so smaller elements go left and larger elements go right, then recursively sort subarrays.",
+    timeComplexity: "O(n²) worst, O(n log n) average",
+    spaceComplexity: "O(log n)",
+    dryRun: [
+      "Pass 1:",
+      "Pivot = 4 (idx 0)",
+      "Compare 1 < 7 swap 6 and 3",
+      "Compare 3 < 6 swap 5 and 1",
+      " place pivot 4 at idx 3",
+      " array: [1,3,2,4,7,9,5,6]",
+      "Pass 2:",
+      "Pivot = 1 (idx 0)",
+      " place pivot 1 at idx 0",
+      " array: [1,3,2,4,7,9,5,6]",
+      "Pass 3:",
+      "Pivot = 3 (idx 1)",
+      " place pivot 3 at idx 2",
+      " array: [1,2,3,4,7,9,5,6]",
+      "Pass 4:",
+      "Pivot = 7 (idx 4)",
+      "Compare 5 < 7 swap 9 and 6",
+      " place pivot 7 at idx 6",
+      " array: [1,2,3,4,5,6,7,9]",
+      "Pass 5:",
+      "Pivot = 5 (idx 4)",
+      " place pivot 5 at idx 4",
+      " array: [1,2,3,4,5,6,7,9]",
+      "Final Sorted Output: [1,2,3,4,5,6,7,9]",
+    ],
+    edgeCases: [
+      "Already sorted array",
+      "Reverse sorted array",
+      "All elements identical",
+      "Very large arrays",
+    ],
+    tips: [
+      "Worst case occurs for sorted or reverse-sorted arrays.",
+      "Pivot choice affects performance heavily.",
+    ],
+    code: `function quickSortFirst(arr, low, high) {
+  if (low >= high) return;
+
+  let pivot = arr[low];
+  let i = low;
+  let j = high;
+
+  while (i < j) {
+    while (arr[i] <= pivot && i <= high - 1) i++;
+    while (arr[j] > pivot && j >= low + 1) j--;
+    if (i < j) [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+
+  [arr[low], arr[j]] = [arr[j], arr[low]];
+
+  quickSortFirst(arr, low, j - 1);
+  quickSortFirst(arr, j + 1, high);
+  return arr;
+}`,
+    dryRunFunc: (inputArray) => {
+      const logs = [];
+      let arr = [...inputArray];
+
+      let pass = 1;
+      const log = (m) => logs.push(m);
+
+      const quick = (low, high) => {
+        if (low >= high) return;
+
+        let pivot = arr[low];
+        log(`Pass ${pass++}:`);
+        log(`Pivot = ${pivot} (idx ${low})`);
+
+        let i = low;
+        let j = high;
+
+        while (i < j) {
+          while (arr[i] <= pivot && i < high) i++;
+          while (arr[j] > pivot && j > low) j--;
+
+          if (i < j) {
+            log(`Compare ${i} < ${j} swap ${arr[i]} and ${arr[j]}`);
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+          }
+        }
+
+        log(` place pivot ${pivot} at idx ${j}`);
+        [arr[low], arr[j]] = [arr[j], arr[low]];
+        log(` array: ${JSON.stringify(arr)}`);
+
+        quick(low, j - 1);
+        quick(j + 1, high);
+      };
+
+      quick(0, arr.length - 1);
+      log(`Final Sorted Output: ${JSON.stringify(arr)}`);
+      return logs;
+    },
+    input: "[4,6,2,5,7,9,1,3]",
+  },
+  {
+    id: 8,
+    title: "Quick Sort (Last Element Pivot)",
+    category: "Sorting",
+    algorithm:
+      "Choose the last element as pivot, partition the array using Lomuto partitioning, then recursively sort the partitions.",
+    timeComplexity: "O(n²) worst, O(n log n) average",
+    spaceComplexity: "O(log n)",
+    dryRun: [
+      "Pass 1:",
+      "Pivot = 3",
+      "Compare 2 < 3 swap 4 and 2",
+      "Compare 1 < 3 swap 6 and 1",
+      " place pivot, array: [2,1,3,5,7,9,6,4]",
+      "Pass 2:",
+      "Pivot = 1",
+      " place pivot, array: [1,2,3,5,7,9,6,4]",
+      "Pass 3:",
+      "Pivot = 4",
+      " place pivot, array: [1,2,3,4,7,9,6,5]",
+      "Pass 4:",
+      "Pivot = 5",
+      " place pivot, array: [1,2,3,4,5,9,6,7]",
+      "Pass 5:",
+      "Pivot = 7",
+      "Compare 6 < 7 swap 9 and 6",
+      " place pivot, array: [1,2,3,4,5,6,7,9]",
+      "Final Sorted Output: [1,2,3,4,5,6,7,9]",
+    ],
+    edgeCases: [
+      "Sorted array performs worst",
+      "Stable only with modifications",
+    ],
+    tips: ["Lomuto partition is simple but produces more swaps."],
+    code: `function quickSortLast(arr, low, high) {
+  if (low >= high) return;
+
+  let pivot = arr[high];
+  let i = low - 1;
+
+  for (let j = low; j < high; j++) {
+    if (arr[j] < pivot) {
+      i++;
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+  }
+
+  [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
+  const p = i + 1;
+
+  quickSortLast(arr, low, p - 1);
+  quickSortLast(arr, p + 1, high);
+  return arr;
+}`,
+    dryRunFunc: (inputArray) => {
+      const logs = [];
+      let arr = [...inputArray];
+      let pass = 1;
+
+      const log = (m) => logs.push(m);
+
+      const quick = (low, high) => {
+        if (low >= high) return;
+        log(`Pass ${pass++}:`);
+
+        let pivot = arr[high];
+        log(`Pivot = ${pivot}`);
+
+        let i = low - 1;
+
+        for (let j = low; j < high; j++) {
+          if (arr[j] < pivot) {
+            i++;
+            log(`Compare ${arr[j]} < ${pivot} swap ${arr[i]} and ${arr[j]}`);
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+          }
+        }
+
+        [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
+        log(` place pivot, array: ${JSON.stringify(arr)}`);
+
+        quick(low, i);
+        quick(i + 2, high);
+      };
+
+      quick(0, arr.length - 1);
+      log(`Final Sorted Output: ${JSON.stringify(arr)}`);
+      return logs;
+    },
+    input: "[4,6,2,5,7,9,1,3]",
+  },
+  {
+    id: 9,
+    title: "Quick Sort (Median-of-Three Pivot)",
+    category: "Sorting",
+    algorithm:
+      "Choose the median of (first, middle, last) elements as pivot to reduce worst-case scenarios.",
+    timeComplexity: "O(n log n)",
+    spaceComplexity: "O(log n)",
+    dryRun: [
+      "Pass 1:",
+      "Median-of-three: 4, 5, 3; median:4",
+      "Pick pivot 4",
+      " swap 4 and 4",
+      "Compare 1 < 7 swap 6 and 3",
+      "Compare 3 < 6 swap 5 and 1",
+      " array: [1,3,2,4,7,9,5,6]",
+      "Pass 2:",
+      "Median-of-three: 1, 3, 2; median:2",
+      "Pick pivot 2",
+      " swap 2 and 1",
+      "Compare 1 < 2 swap 3 and 1",
+      " array: [1,2,3,4,7,9,5,6]",
+      "Pass 3:",
+      "Median-of-three: 7, 9, 6; median:7",
+      "Pick pivot 7",
+      " swap 7 and 7",
+      "Compare 5 < 7 swap 9 and 6",
+      " array: [1,2,3,4,5,6,7,9]",
+      "Pass 4:",
+      "Median-of-three: 5, 5, 6; median:5",
+      "Pick pivot 5",
+      " swap 5 and 5",
+      " array: [1,2,3,4,5,6,7,9]",
+      "Final Sorted Output: [1,2,3,4,5,6,7,9]",
+    ],
+    edgeCases: [
+      "Handles sorted arrays better",
+      "Good pivot choice for stability",
+    ],
+    tips: ["One of the best pivot strategies for general inputs."],
+    code: `function medianOfThree(arr, low, high) {
+  const mid = Math.floor((low + high) / 2);
+  const a = arr[low], b = arr[mid], c = arr[high];
+
+  if ((a - b)*(c - a) >= 0) return low;
+  if ((b - a)*(c - b) >= 0) return mid;
+  return high;
+}
+
+function quickSortMedian(arr, low, high) {
+  if (low >= high) return;
+
+  const pivotIndex = medianOfThree(arr, low, high);
+  const pivot = arr[pivotIndex];
+
+  [arr[pivotIndex], arr[low]] = [arr[low], arr[pivotIndex]];
+
+  let i = low;
+  let j = high;
+
+  while (i < j) {
+    while (arr[i] <= pivot && i <= high - 1) i++;
+    while (arr[j] > pivot && j >= low + 1) j--;
+    if (i < j) [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+
+  [arr[low], arr[j]] = [arr[j], arr[low]];
+
+  quickSortMedian(arr, low, j - 1);
+  quickSortMedian(arr, j + 1, high);
+
+  return arr;
+}`,
+    dryRunFunc: (inputArray) => {
+      const logs = [];
+      let arr = [...inputArray];
+
+      let pass = 1;
+      const log = (m) => logs.push(m);
+
+      const quick = (low, high) => {
+        if (low >= high) return;
+        log(`Pass ${pass++}:`);
+
+        let mid = Math.floor((low + high) / 2);
+
+        let a = arr[low],
+          b = arr[mid],
+          c = arr[high];
+
+        let pivotIndex =
+          (a - b) * (c - a) >= 0 ? low : (b - a) * (c - b) >= 0 ? mid : high;
+        log(`Median-of-three: ${a}, ${b}, ${c}; median:${arr[pivotIndex]}`);
+
+        let pivot = arr[pivotIndex];
+        log(`Pick pivot ${pivot}`);
+
+        log(` swap ${arr[pivotIndex]} and ${arr[low]}`);
+        [arr[pivotIndex], arr[low]] = [arr[low], arr[pivotIndex]];
+
+        let i = low;
+        let j = high;
+
+        while (i < j) {
+          while (arr[i] <= pivot && i < high) i++;
+          while (arr[j] > pivot && j > low) j--;
+          if (i < j) {
+            log(`Compare ${i} < ${j} swap ${arr[i]} and ${arr[j]}`);
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+          }
+        }
+
+        [arr[low], arr[j]] = [arr[j], arr[low]];
+        log(` array: ${JSON.stringify(arr)}`);
+
+        quick(low, j - 1);
+        quick(j + 1, high);
+      };
+
+      quick(0, arr.length - 1);
+      log(`Final Sorted Output: ${JSON.stringify(arr)}`);
+      return logs;
+    },
+    input: "[4,6,2,5,7,9,1,3]",
+  },
+  {
+    id: 10,
+    title: "Quick Sort (Random Pivot)",
+    category: "Sorting",
+    algorithm:
+      "Pick a random element as pivot to avoid worst-case inputs like sorted arrays. Then partition using Hoare partition and recursively sort.",
+    timeComplexity: "O(n log n) average",
+    spaceComplexity: "O(log n)",
+    dryRun: [
+      "Pass 1:",
+      "Random pivot = 6 (idx 1)",
+      " swap 6 and 4",
+      "Compare 4 < 7 swap 7 and 3",
+      "Compare 5 < 6 swap 9 and 1",
+      "swap 6 and 1",
+      " array: [1,4,2,5,3,6,9,7]",
+      "Pass 2:",
+      "Random pivot = 2 (idx 2)",
+      " swap 2 and 1",
+      "Compare 1 < 2 swap 4 and 1",
+      "swap 2 and 1",
+      " array: [1,2,4,5,3,6,9,7]",
+      "Pass 3:",
+      "Random pivot = 5 (idx 3)",
+      " swap 5 and 4",
+      "swap 5 and 3",
+      " array: [1,2,3,4,5,6,9,7]",
+      "Pass 4:",
+      "Random pivot = 3 (idx 2)",
+      " swap 3 and 3",
+      "swap 3 and 3",
+      " array: [1,2,3,4,5,6,9,7]",
+      "Pass 5:",
+      "Random pivot = 7 (idx 7)",
+      " swap 7 and 9",
+      "swap 7 and 7",
+      " array: [1,2,3,4,5,6,7,9]",
+      "Final Sorted Output: [1,2,3,4,5,6,7,9]",
+    ],
+    edgeCases: [
+      "Random pivot avoids worst case",
+      "Good for unpredictable input",
+    ],
+    tips: [
+      "Best practical performance on average.",
+      "Random pivot prevents adversarial input.",
+    ],
+    code: `function quickSortRandom(arr, low, high) {
+  if (low >= high) return;
+
+  let pivotIndex = low + Math.floor(Math.random() * (high - low + 1));
+  let pivot = arr[pivotIndex];
+
+  [arr[pivotIndex], arr[low]] = [arr[low], arr[pivotIndex]];
+
+  let i = low;
+  let j = high;
+
+  while (i < j) {
+    while (arr[i] <= pivot && i <= high - 1) i++;
+    while (arr[j] > pivot && j >= low + 1) j--;
+    if (i < j) [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+
+  [arr[low], arr[j]] = [arr[j], arr[low]];
+
+  quickSortRandom(arr, low, j - 1);
+  quickSortRandom(arr, j + 1, high);
+  return arr;
+}`,
+    dryRunFunc: (inputArray) => {
+      const logs = [];
+      let arr = [...inputArray];
+
+      let pass = 1;
+      const log = (m) => logs.push(m);
+
+      const quick = (low, high) => {
+        if (low >= high) return;
+        log(`Pass ${pass++}:`);
+
+        let pivotIndex = low + Math.floor(Math.random() * (high - low + 1));
+        let pivot = arr[pivotIndex];
+        log(`Random pivot = ${pivot} (idx ${pivotIndex})`);
+        log(` swap ${arr[pivotIndex]} and ${arr[low]}`);
+
+        [arr[pivotIndex], arr[low]] = [arr[low], arr[pivotIndex]];
+
+        let i = low;
+        let j = high;
+
+        while (i < j) {
+          while (arr[i] <= pivot && i < high) i++;
+          while (arr[j] > pivot && j > low) j--;
+          if (i < j) {
+            log(`Compare ${i} < ${j} swap ${arr[i]} and ${arr[j]}`);
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+          }
+        }
+
+        log(`swap ${arr[low]} and ${arr[j]}`);
+
+        [arr[low], arr[j]] = [arr[j], arr[low]];
+        log(` array: ${JSON.stringify(arr)}`);
+
+        quick(low, j - 1);
+        quick(j + 1, high);
+      };
+
+      quick(0, arr.length - 1);
+      log(`Final Sorted Output: ${JSON.stringify(arr)}`);
+      return logs;
+    },
+    input: "[4,6,2,5,7,9,1,3]",
   },
 ];
 
 export { dsaAlgorithms, reactQuestionsData };
+
