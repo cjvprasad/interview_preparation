@@ -1,373 +1,4 @@
- const dsaAlgorithms = [
-  {
-    id: 1,
-    title: "Two Pointers (Arrays)",
-    category: "Arrays & Strings",
-    algorithm:
-      "Use two indices (left/right) moving towards each other or in same direction to solve problems in O(n).",
-    timeComplexity: "O(n)",
-    spaceComplexity: "O(1)",
-    dryRun: [
-      "Input: arr=[1, 2, 3, 4, 6], target=6",
-      "L=0(1), R=4(6) -> Sum=7 (>6) -> Dec R",
-      "L=0(1), R=3(4) -> Sum=5 (<6) -> Inc L",
-      "L=1(2), R=3(4) -> Sum=6 (Found)",
-    ],
-    edgeCases: ["Array has 1 element", "No pair exists", "Negative numbers"],
-    tips: [
-      "Great for 'Two Sum' on sorted arrays.",
-      "Used for reversing strings or checking palindromes.",
-    ],
-    code: `function twoSumSorted(arr, target) {
-  let left = 0, right = arr.length - 1;
-  while (left < right) {
-    let sum = arr[left] + arr[right];
-    if (sum === target) return [left + 1, right + 1];
-    else if (sum < target) left++;
-    else right--;
-  }
-  return [];
-}`,
-  },
-  {
-    id: 2,
-    title: "Sliding Window (Fixed)",
-    category: "Arrays & Strings",
-    algorithm:
-      "Maintain a window of size k. Slide it one step right: subtract element leaving, add element entering.",
-    timeComplexity: "O(n)",
-    spaceComplexity: "O(1)",
-    dryRun: [
-      "Arr: [1, 4, 2, 10, 2], k=3",
-      "Init window [0..2]: 1+4+2 = 7. Max=7",
-      "Slide 1: 7 - 1 (left) + 10 (new) = 16. Max=16",
-      "Slide 2: 16 - 4 + 2 = 14. Max=16",
-    ],
-    edgeCases: ["k > array length", "k = 1"],
-    tips: [
-      "Identified by keywords like 'subarray of size k', 'longest substring'.",
-      "Distinguish between Fixed vs Dynamic window.",
-    ],
-    code: `function maxSumSubarray(arr, k) {
-  if (arr.length < k) return null;
-  let currentSum = 0;
-  // First window
-  for (let i=0; i<k; i++) currentSum += arr[i];
-  let maxSum = currentSum;
-  // Slide
-  for (let i=k; i<arr.length; i++) {
-    currentSum += arr[i] - arr[i-k];
-    maxSum = Math.max(maxSum, currentSum);
-  }
-  return maxSum;
-}`,
-  },
-  {
-    id: 3,
-    title: "Binary Search",
-    category: "Search",
-    algorithm:
-      "Find element in sorted array by repeatedly dividing search interval in half.",
-    timeComplexity: "O(log n)",
-    spaceComplexity: "O(1)",
-    dryRun: [
-      "Arr: [1, 3, 5, 7, 9], Target: 7",
-      "Mid=5. 5 < 7? Yes, ignore left.",
-      "New Range: [7, 9]. Mid=7. Found.",
-    ],
-    edgeCases: [
-      "Empty array",
-      "Target smaller/larger than all",
-      "Duplicates (if finding first/last)",
-    ],
-    tips: [
-      "Only works on sorted data.",
-      "Careful with overflow: mid = l + Math.floor((r-l)/2)",
-    ],
-    code: `function binarySearch(arr, target) {
-  let l = 0, r = arr.length - 1;
-  while (l <= r) {
-    let mid = l + Math.floor((r - l) / 2);
-    if (arr[mid] === target) return mid;
-    if (arr[mid] < target) l = mid + 1;
-    else r = mid - 1;
-  }
-  return -1;
-}`,
-  },
-  {
-    id: 4,
-    title: "Merge Sort",
-    category: "Sorting",
-    algorithm:
-      "Divide & Conquer. Recursively split array in half, sort halves, then merge them.",
-    timeComplexity: "O(n log n)",
-    spaceComplexity: "O(n)",
-    dryRun: [
-      "Split [4, 2, 1, 3] -> [4, 2] | [1, 3]",
-      "Split [4, 2] -> [4]|[2] -> Merge -> [2, 4]",
-      "Merge [2, 4] and [1, 3] -> [1, 2, 3, 4]",
-    ],
-    edgeCases: ["Already sorted", "Reverse sorted"],
-    tips: [
-      "It is a STABLE sort (preserves order of duplicates).",
-      "Guaranteed O(n log n) unlike Quicksort.",
-    ],
-    code: `function mergeSort(arr) {
-  if (arr.length <= 1) return arr;
-  const mid = Math.floor(arr.length / 2);
-  const left = mergeSort(arr.slice(0, mid));
-  const right = mergeSort(arr.slice(mid));
-  return merge(left, right);
-}
-
-function merge(left, right) {
-  let res = [], i = 0, j = 0;
-  while (i < left.length && j < right.length) {
-    if (left[i] < right[j]) res.push(left[i++]);
-    else res.push(right[j++]);
-  }
-  return [...res, ...left.slice(i), ...right.slice(j)];
-}`,
-  },
-  {
-    id: 5,
-    title: "BFS (Graph/Tree)",
-    category: "Graph",
-    algorithm:
-      "Breadth-First Search. Explore neighbors layer by layer using a Queue.",
-    timeComplexity: "O(V + E)",
-    spaceComplexity: "O(V)",
-    dryRun: [
-      "Q: [Start]",
-      "Pop Start, add neighbors A, B -> Q: [A, B]",
-      "Pop A, add neighbors -> Q: [B, C]",
-    ],
-    edgeCases: ["Disconnected graph", "Cycles (Need visited set)"],
-    tips: [
-      "Use for 'Shortest Path' in unweighted graphs.",
-      "Level order traversal.",
-    ],
-    code: `function bfs(graph, start) {
-  const queue = [start];
-  const visited = new Set([start]);
-  while (queue.length > 0) {
-    const node = queue.shift();
-    console.log(node);
-    for (let neighbor of graph[node]) {
-      if (!visited.has(neighbor)) {
-        visited.add(neighbor);
-        queue.push(neighbor);
-      }
-    }
-  }
-}`,
-  },
- {
-    id: 6,
-    title: "Bubble Sort",
-    category: "Sorting",
-    algorithm:
-      "Repeatedly compare adjacent elements and swap them if they are in the wrong order. Largest elements bubble to the end after each pass.",
-    timeComplexity: "O(n²)",
-    spaceComplexity: "O(1)",
-    dryRun: [
-      "Pass 1:",
-      "(13,24) -> ok",
-      "(24,46) -> ok",
-      "(46,20) -> swap",
-      "(46,9) -> swap",
-      "(46,52) -> ok",
-      "Result after Pass 1: [13,24,20,9,46,52]",
-      "Pass 2:",
-      "(13,24) -> ok",
-      "(24,20) -> swap",
-      "(24,9) -> swap",
-      "(24,46) -> ok",
-      "Result after Pass 2: [13,20,9,24,46,52]",
-      "Pass 3:",
-      "(13,20) -> ok",
-      "(20,9) -> swap",
-      "(20,24) -> ok",
-      "Result after Pass 3: [13,9,20,24,46,52]",
-      "Pass 4:",
-      "(13,9) -> swap",
-      "(13,20) -> ok",
-      "Result after Pass 4: [9,13,20,24,46,52]",
-      "Pass 5:",
-      "(9,13) -> ok",
-      "Result after Pass 5: [9,13,20,24,46,52]",
-      "Final Sorted Output: [9,13,20,24,46,52]",
-    ],
-
-    edgeCases: [
-      "Already sorted array",
-      "Reverse sorted array",
-      "Array with duplicates",
-    ],
-    tips: [
-      "Best case O(n) when array is already sorted using an optimized flag.",
-      "Used for small datasets where simplicity matters.",
-    ],
-    code: `function bubbleSort(arr) {
-  let n = arr.length;
-  for (let i = 0; i < n - 1; i++) {
-    let swapped = false;
-    for (let j = 0; j < n - i - 1; j++) {
-      if (arr[j] > arr[j + 1]) {
-        let temp = arr[j];
-        arr[j] = arr[j + 1];
-        arr[j + 1] = temp;
-        swapped = true;
-      }
-    }
-    if (!swapped) break; // Optimization
-  }
-  return arr;
-}`,
-    pages: "true",
-    dryRunFunc: (inputArray) => {
-      const logs = [];
-      let arr = [...inputArray]; // Avoid mutating original
-      let n = arr.length;
-      let pass = 1;
-
-      // Helper to push logs (mimicking console.log)
-      const log = (msg, detail = "") => {
-        logs.push(detail ? `${msg} ${detail}` : msg);
-      };
-
-      for (let i = 0; i < n - 1; i++) {
-        log(`Pass ${pass}:`);
-        let swapped = false;
-
-        for (let j = 0; j < n - i - 1; j++) {
-          const left = arr[j];
-          const right = arr[j + 1];
-
-          if (left > right) {
-            log(`(${left},${right}) -> swap`);
-            [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
-            swapped = true;
-          } else {
-            log(`(${left},${right}) -> ok`);
-          }
-        }
-
-        log(`Result after Pass ${pass}:`, JSON.stringify(arr));
-
-        pass++;
-        if (!swapped) break;
-      }
-
-      log("Final Sorted Output:", JSON.stringify(arr));
-      return logs;
-    },
-    input: "[13, 24, 46, 20, 9, 52]",
-  },
-  {
-    id: 7,
-    title: "Selection Sort",
-    category: "Sorting",
-    algorithm:
-      "Find the minimum element from the unsorted part and swap it with the element at the current index.",
-    timeComplexity: "O(n²)",
-    spaceComplexity: "O(1)",
-    dryRun: [
-      "Pass 1:",
-      "  Current val: 13 and . Searching for smaller...",
-      "  ➜ Found new min: 9 (at idx 5) < 13",
-      "  SWAP: 13 ⇄ 9",
-      "  Result after Pass 1: [9,46,24,52,20,13]",
-      "Pass 2:",
-      "  Current val: 46 and . Searching for smaller...",
-      "  ➜ Found new min: 24 (at idx 2) < 46",
-      "  ➜ Found new min: 20 (at idx 4) < 24",
-      "  ➜ Found new min: 13 (at idx 5) < 20",
-      "  SWAP: 46 ⇄ 13",
-      "  Result after Pass 2: [9,13,24,52,20,46]",
-      "Pass 3:",
-      "  Current val: 24 and . Searching for smaller...",
-      "  ➜ Found new min: 20 (at idx 4) < 24",
-      "  SWAP: 24 ⇄ 20",
-      "  Result after Pass 3: [9,13,20,52,24,46]",
-      "Pass 4:",
-      "  Current val: 52 and . Searching for smaller...",
-      "  ➜ Found new min: 24 (at idx 4) < 52",
-      "  SWAP: 52 ⇄ 24",
-      "  Result after Pass 4: [9,13,20,24,52,46]",
-      "Pass 5:",
-      "  Current val: 52 and . Searching for smaller...",
-      "  ➜ Found new min: 46 (at idx 5) < 52",
-      "  SWAP: 52 ⇄ 46",
-      "  Result after Pass 5: [9,13,20,24,46,52]",
-      "Final Sorted Output: [9,13,20,24,46,52]",
-    ],
-    edgeCases: [
-      "Array with identical elements",
-      "Single element array",
-      "Already sorted array",
-    ],
-    tips: [
-      "Always performs the same number of comparisons.",
-      "Faster than Bubble Sort in practice due to fewer swaps.",
-    ],
-    code: `function selectionSort(arr) {
-  let n = arr.length;
-  for (let i = 0; i < n - 1; i++) {
-    let minIdx = i;
-    for (let j = i + 1; j < n; j++) {
-      if (arr[j] < arr[minIdx]) {
-        minIdx = j;
-      }
-    }
-    let temp = arr[i];
-    arr[i] = arr[minIdx];
-    arr[minIdx] = temp;
-  }
-  return arr;
-}`,
-    dryRunFunc: (inputArray) => {
-      const logs = [];
-      let arr = [...inputArray]; // Avoid mutating original
-      let n = arr.length;
-
-      // Helper to push logs
-      const log = (msg) => logs.push(msg);
-
-      for (let i = 0; i < n - 1; i++) {
-        log(`Pass ${i + 1}:`);
-        let minIdx = i;
-
-        log(`  Current val: ${arr[i]} and . Searching for smaller...`);
-
-        for (let j = i + 1; j < n; j++) {
-          if (arr[j] < arr[minIdx]) {
-            log(`  ➜ Found new min: ${arr[j]} (at idx ${j}) < ${arr[minIdx]}`);
-            minIdx = j;
-          }
-        }
-
-        if (minIdx !== i) {
-          log(`  SWAP: ${arr[i]} ⇄ ${arr[minIdx]}`);
-          let temp = arr[i];
-          arr[i] = arr[minIdx];
-          arr[minIdx] = temp;
-        } else {
-          log(`  NO SWAP: ${arr[i]} is already the smallest remaining.`);
-        }
-
-        log(`  Result after Pass ${i + 1}: ${JSON.stringify(arr)}`);
-      }
-
-      log(`Final Sorted Output: ${JSON.stringify(arr)}`);
-      return logs;
-    },
-    input: "[13,46,24,52,20,9]",
-  },
-];
-
- const reactQuestionsData = [
+const reactQuestionsData = [
   // JS CORE
 
   // Q1: bind() vs call() vs apply() - COMBINED Q1 & Q12
@@ -1575,6 +1206,897 @@ function merge(left, right) {
       "toString(): 5,20,3,10\njoin(): 5 | 20 | 3 | 10\nconcat(): [5, 20, 3, 10, 1, 2]\nArray.from(): ['a', 'b', 'c']\n// ... (full console output from Q82)",
   },
 ];
+const dsaAlgorithms = [
+  {
+    id: 1,
+    title: "Selection Sort",
+    category: "Sorting",
+    algorithm:
+      "Find the minimum element from the unsorted part and swap it with the element at the current index.",
+    timeComplexity: "O(n²)",
+    spaceComplexity: "O(1)",
+    dryRun: [
+      "Pass 1:",
+      "  Current val: 13 and . Searching for smaller...",
+      "  ➜ Found new min: 9 (at idx 5) < 13",
+      "  SWAP: 13 ⇄ 9",
+      "  Result after Pass 1: [9,46,24,52,20,13]",
+      "Pass 2:",
+      "  Current val: 46 and . Searching for smaller...",
+      "  ➜ Found new min: 24 (at idx 2) < 46",
+      "  ➜ Found new min: 20 (at idx 4) < 24",
+      "  ➜ Found new min: 13 (at idx 5) < 20",
+      "  SWAP: 46 ⇄ 13",
+      "  Result after Pass 2: [9,13,24,52,20,46]",
+      "Pass 3:",
+      "  Current val: 24 and . Searching for smaller...",
+      "  ➜ Found new min: 20 (at idx 4) < 24",
+      "  SWAP: 24 ⇄ 20",
+      "  Result after Pass 3: [9,13,20,52,24,46]",
+      "Pass 4:",
+      "  Current val: 52 and . Searching for smaller...",
+      "  ➜ Found new min: 24 (at idx 4) < 52",
+      "  SWAP: 52 ⇄ 24",
+      "  Result after Pass 4: [9,13,20,24,52,46]",
+      "Pass 5:",
+      "  Current val: 52 and . Searching for smaller...",
+      "  ➜ Found new min: 46 (at idx 5) < 52",
+      "  SWAP: 52 ⇄ 46",
+      "  Result after Pass 5: [9,13,20,24,46,52]",
+      "Final Sorted Output: [9,13,20,24,46,52]",
+    ],
+    edgeCases: [
+      "Array with identical elements",
+      "Single element array",
+      "Already sorted array",
+    ],
+    tips: [
+      "Always performs the same number of comparisons.",
+      "Faster than Bubble Sort in practice due to fewer swaps.",
+    ],
+    code: `function selectionSort(arr) {
+  let n = arr.length;
+  for (let i = 0; i < n - 1; i++) {
+    let minIdx = i;
+    for (let j = i + 1; j < n; j++) {
+      if (arr[j] < arr[minIdx]) {
+        minIdx = j;
+      }
+    }
+    let temp = arr[i];
+    arr[i] = arr[minIdx];
+    arr[minIdx] = temp;
+  }
+  return arr;
+}`,
+    dryRunFunc: (inputArray) => {
+      const logs = [];
+      let arr = [...inputArray]; // Avoid mutating original
+      let n = arr.length;
 
+      // Helper to push logs
+      const log = (msg) => logs.push(msg);
 
+      for (let i = 0; i < n - 1; i++) {
+        log(`Pass ${i + 1}:`);
+        let minIdx = i;
 
+        log(` Current val: ${arr[i]}. Searching for smaller...`);
+
+        for (let j = i + 1; j < n; j++) {
+          if (arr[j] < arr[minIdx]) {
+            log(`  ➜ Found new min: ${arr[j]} (at idx ${j}) < ${arr[minIdx]}`);
+            minIdx = j;
+          }
+        }
+
+        if (minIdx !== i) {
+          log(`  SWAP: ${arr[i]} ⇄ ${arr[minIdx]}`);
+          let temp = arr[i];
+          arr[i] = arr[minIdx];
+          arr[minIdx] = temp;
+        } else {
+          log(`  NO SWAP: ${arr[i]} is already the smallest remaining.`);
+        }
+
+        log(`  Result after Pass ${i + 1}: ${JSON.stringify(arr)}`);
+      }
+
+      log(`Final Sorted Output: ${JSON.stringify(arr)}`);
+      return logs;
+    },
+    input: "[13,46,24,52,20,9]",
+  },
+  {
+    id: 2,
+    title: "Bubble Sort",
+    category: "Sorting",
+    algorithm:
+      "Repeatedly compare adjacent elements and swap them if they are in the wrong order. Largest elements bubble to the end after each pass.",
+    timeComplexity: "O(n²)",
+    spaceComplexity: "O(1)",
+    dryRun: [
+      "Pass 1:",
+      "(13,24) -> ok",
+      "(24,46) -> ok",
+      "(46,20) -> swap",
+      "(46,9) -> swap",
+      "(46,52) -> ok",
+      "Result after Pass 1: [13,24,20,9,46,52]",
+      "Pass 2:",
+      "(13,24) -> ok",
+      "(24,20) -> swap",
+      "(24,9) -> swap",
+      "(24,46) -> ok",
+      "Result after Pass 2: [13,20,9,24,46,52]",
+      "Pass 3:",
+      "(13,20) -> ok",
+      "(20,9) -> swap",
+      "(20,24) -> ok",
+      "Result after Pass 3: [13,9,20,24,46,52]",
+      "Pass 4:",
+      "(13,9) -> swap",
+      "(13,20) -> ok",
+      "Result after Pass 4: [9,13,20,24,46,52]",
+      "Pass 5:",
+      "(9,13) -> ok",
+      "Result after Pass 5: [9,13,20,24,46,52]",
+      "Final Sorted Output: [9,13,20,24,46,52]",
+    ],
+    edgeCases: [
+      "Already sorted array",
+      "Reverse sorted array",
+      "Array with duplicates",
+    ],
+    tips: [
+      "Best case O(n) when array is already sorted using an optimized flag.",
+      "Used for small datasets where simplicity matters.",
+    ],
+    code: `function bubbleSort(arr) {
+  let n = arr.length;
+  for (let i = 0; i < n - 1; i++) {
+    let swapped = false;
+    for (let j = 0; j < n - i - 1; j++) {
+      if (arr[j] > arr[j + 1]) {
+        let temp = arr[j];
+        arr[j] = arr[j + 1];
+        arr[j + 1] = temp;
+        swapped = true;
+      }
+    }
+    if (!swapped) break; // Optimization
+  }
+  return arr;
+}`,
+    dryRunFunc: (inputArray) => {
+      const logs = [];
+      let arr = [...inputArray]; // Avoid mutating original
+      let n = arr.length;
+      let pass = 1;
+
+      // Helper to push logs (mimicking console.log)
+      const log = (msg, detail = "") => {
+        logs.push(detail ? `${msg} ${detail}` : msg);
+      };
+
+      for (let i = 0; i < n - 1; i++) {
+        log(`Pass ${pass}:`);
+        let swapped = false;
+
+        for (let j = 0; j < n - i - 1; j++) {
+          const left = arr[j];
+          const right = arr[j + 1];
+
+          if (left > right) {
+            log(`(${left},${right}) -> swap`);
+            [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+            swapped = true;
+          } else {
+            log(`(${left},${right}) -> ok`);
+          }
+        }
+
+        log(`Result after Pass ${pass}:`, JSON.stringify(arr));
+
+        pass++;
+        if (!swapped) break;
+      }
+
+      log("Final Sorted Output:", JSON.stringify(arr));
+      return logs;
+    },
+    input: "[13, 24, 46, 20, 9, 52]",
+  },
+  {
+    id: 3,
+    title: "Recursive Bubble Sort",
+    category: "Sorting",
+    algorithm:
+      "Repeatedly compare adjacent elements and swap them if they are in the wrong order. Largest elements bubble to the end after each pass.",
+    timeComplexity: "O(n²)",
+    spaceComplexity: "O(1)",
+    dryRun: [
+      "Pass 1:",
+      "(13,24) -> ok",
+      "(24,46) -> ok",
+      "(46,20) -> swap",
+      "(46,9) -> swap",
+      "(46,52) -> ok",
+      "Result after Pass 1: [13,24,20,9,46,52]",
+      "Pass 2:",
+      "(13,24) -> ok",
+      "(24,20) -> swap",
+      "(24,9) -> swap",
+      "(24,46) -> ok",
+      "Result after Pass 2: [13,20,9,24,46,52]",
+      "Pass 3:",
+      "(13,20) -> ok",
+      "(20,9) -> swap",
+      "(20,24) -> ok",
+      "Result after Pass 3: [13,9,20,24,46,52]",
+      "Pass 4:",
+      "(13,9) -> swap",
+      "(13,20) -> ok",
+      "Result after Pass 4: [9,13,20,24,46,52]",
+      "Pass 5:",
+      "(9,13) -> ok",
+      "Result after Pass 5: [9,13,20,24,46,52]",
+      "Final Sorted Output: [9,13,20,24,46,52]",
+    ],
+    edgeCases: [
+      "Already sorted array",
+      "Reverse sorted array",
+      "Array with duplicates",
+    ],
+    tips: [
+      "Best case O(n) when array is already sorted using an optimized flag.",
+      "Used for small datasets where simplicity matters.",
+    ],
+    code: `function bubbleSort(arr) {
+  let n = arr.length;
+  for (let i = 0; i < n - 1; i++) {
+    let swapped = false;
+    for (let j = 0; j < n - i - 1; j++) {
+      if (arr[j] > arr[j + 1]) {
+        let temp = arr[j];
+        arr[j] = arr[j + 1];
+        arr[j + 1] = temp;
+        swapped = true;
+      }
+    }
+    if (!swapped) break; // Optimization
+  }
+  return arr;
+}`,
+    dryRunFunc: (inputArray) => {
+      const logs = [];
+      let arr = [...inputArray]; // Avoid mutating original
+      let n = arr.length;
+      let pass = 1;
+
+      // Helper to push logs (mimicking console.log)
+      const log = (msg, detail = "") => {
+        logs.push(detail ? `${msg} ${detail}` : msg);
+      };
+
+      for (let i = 0; i < n - 1; i++) {
+        log(`Pass ${pass}:`);
+        let swapped = false;
+
+        for (let j = 0; j < n - i - 1; j++) {
+          const left = arr[j];
+          const right = arr[j + 1];
+
+          if (left > right) {
+            log(`(${left},${right}) -> swap`);
+            [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+            swapped = true;
+          } else {
+            log(`(${left},${right}) -> ok`);
+          }
+        }
+
+        log(`Result after Pass ${pass}:`, JSON.stringify(arr));
+
+        pass++;
+        if (!swapped) break;
+      }
+
+      log("Final Sorted Output:", JSON.stringify(arr));
+      return logs;
+    },
+    input: "[13, 24, 46, 20, 9, 52]",
+  },
+
+  {
+    id: 4,
+    title: "Insertion Sort",
+    category: "Sorting",
+    algorithm:
+      "Pick an element and insert it into its correct position by shifting larger elements to the right.",
+    timeComplexity: "O(n²)",
+    spaceComplexity: "O(1)",
+    dryRun: [
+      "Pass 1:",
+      "  Current val: 9 (at idx 1). Checking left elements...",
+      "   ➜ Compare: 14 > 9 (idx 0 > idx 1) → swap",
+      "     Array: [9,14,15,12,6,8,13]",
+      "  Result after Pass 1: [9,14,15,12,6,8,13]",
+      "Pass 2:",
+      "  Current val: 15 (at idx 2). Checking left elements...",
+      "   ➜ No smaller element found. No swaps.",
+      "  Result after Pass 2: [9,14,15,12,6,8,13]",
+      "Pass 3:",
+      "  Current val: 12 (at idx 3). Checking left elements...",
+      "   ➜ Compare: 15 > 12 (idx 2 > idx 3) → swap",
+      "     Array: [9,14,12,15,6,8,13]",
+      "   ➜ Compare: 14 > 12 (idx 1 > idx 2) → swap",
+      "     Array: [9,12,14,15,6,8,13]",
+      "  Result after Pass 3: [9,12,14,15,6,8,13]",
+      "Pass 4:",
+      "  Current val: 6 (at idx 4). Checking left elements...",
+      "   ➜ Compare: 15 > 6 (idx 3 > idx 4) → swap",
+      "     Array: [9,12,14,6,15,8,13]",
+      "   ➜ Compare: 14 > 6 (idx 2 > idx 3) → swap",
+      "     Array: [9,12,6,14,15,8,13]",
+      "   ➜ Compare: 12 > 6 (idx 1 > idx 2) → swap",
+      "     Array: [9,6,12,14,15,8,13]",
+      "   ➜ Compare: 9 > 6 (idx 0 > idx 1) → swap",
+      "     Array: [6,9,12,14,15,8,13]",
+      "  Result after Pass 4: [6,9,12,14,15,8,13]",
+      "Pass 5:",
+      "  Current val: 8 (at idx 5). Checking left elements...",
+      "   ➜ Compare: 15 > 8 (idx 4 > idx 5) → swap",
+      "     Array: [6,9,12,14,8,15,13]",
+      "   ➜ Compare: 14 > 8 (idx 3 > idx 4) → swap",
+      "     Array: [6,9,12,8,14,15,13]",
+      "   ➜ Compare: 12 > 8 (idx 2 > idx 3) → swap",
+      "     Array: [6,9,8,12,14,15,13]",
+      "   ➜ Compare: 9 > 8 (idx 1 > idx 2) → swap",
+      "     Array: [6,8,9,12,14,15,13]",
+      "  Result after Pass 5: [6,8,9,12,14,15,13]",
+      "Pass 6:",
+      "  Current val: 13 (at idx 6). Checking left elements...",
+      "   ➜ Compare: 15 > 13 (idx 5 > idx 6) → swap",
+      "     Array: [6,8,9,12,14,13,15]",
+      "   ➜ Compare: 14 > 13 (idx 4 > idx 5) → swap",
+      "     Array: [6,8,9,12,13,14,15]",
+      "  Result after Pass 6: [6,8,9,12,13,14,15]",
+      "Final Sorted Output: [6,8,9,12,13,14,15]",
+    ],
+    edgeCases: [
+      "Already sorted array",
+      "Reverse sorted array",
+      "Single element array",
+      "Array with identical elements",
+    ],
+    tips: [
+      "Efficient for small or nearly sorted arrays.",
+      "Performs well for online input (receives data one by one).",
+      "Stable sorting algorithm.",
+    ],
+    code: `function insertionSort(arr) {
+  let n = arr.length;
+
+  for (let i = 1; i < n; i++) {
+    let j = i;
+
+    // Move left while previous element is greater
+    while (j > 0 && arr[j - 1] > arr[j]) {
+      // swap arr[j-1] and arr[j]
+      let temp = arr[j - 1];
+      arr[j - 1] = arr[j];
+      arr[j] = temp;
+
+      j--;
+    }
+  }
+
+  return arr;
+}`,
+    dryRunFunc: (inputArray) => {
+      const logs = [];
+      let arr = [...inputArray];
+      let n = arr.length;
+      let pass = 1;
+
+      const log = (msg) => logs.push(msg);
+
+      for (let i = 1; i < n; i++) {
+        log(`Pass ${pass}:`);
+        log(
+          `  Current val: ${arr[i]} (at idx ${i}). Checking left elements...`
+        );
+
+        let j = i;
+
+        while (j > 0 && arr[j - 1] > arr[j]) {
+          log(
+            `   ➜ Compare: ${arr[j - 1]} > ${arr[j]} (idx ${
+              j - 1
+            } > idx ${j}) → swap`
+          );
+
+          // Swap
+          let temp = arr[j - 1];
+          arr[j - 1] = arr[j];
+          arr[j] = temp;
+
+          log(`     Array: ${JSON.stringify(arr)}`);
+          j--;
+        }
+
+        if (j === i) {
+          log(`   ➜ No smaller element found. No swaps.`);
+        }
+
+        log(`  Result after Pass ${pass}: ${JSON.stringify(arr)}`);
+        pass++;
+      }
+
+      log(`Final Sorted Output: ${JSON.stringify(arr)}`);
+      return logs;
+    },
+    input: "[14,9,15,12,6,8,13]",
+  },
+  {
+    id: 5,
+    title: "Recursive Insertion Sort",
+    category: "Sorting",
+    algorithm:
+      "Pick an element and insert it into its correct position by shifting larger elements to the right.",
+    timeComplexity: "O(n²)",
+    spaceComplexity: "O(1)",
+    dryRun: [
+      "Pass 1:",
+      "  Current val: 9 (at idx 1). Checking left elements...",
+      "   ➜ Compare: 14 > 9 (idx 0 > idx 1) → swap",
+      "     Array: [9,14,15,12,6,8,13]",
+      "  Result after Pass 1: [9,14,15,12,6,8,13]",
+      "Pass 2:",
+      "  Current val: 15 (at idx 2). Checking left elements...",
+      "   ➜ No smaller element found. No swaps.",
+      "  Result after Pass 2: [9,14,15,12,6,8,13]",
+      "Pass 3:",
+      "  Current val: 12 (at idx 3). Checking left elements...",
+      "   ➜ Compare: 15 > 12 (idx 2 > idx 3) → swap",
+      "     Array: [9,14,12,15,6,8,13]",
+      "   ➜ Compare: 14 > 12 (idx 1 > idx 2) → swap",
+      "     Array: [9,12,14,15,6,8,13]",
+      "  Result after Pass 3: [9,12,14,15,6,8,13]",
+      "Pass 4:",
+      "  Current val: 6 (at idx 4). Checking left elements...",
+      "   ➜ Compare: 15 > 6 (idx 3 > idx 4) → swap",
+      "     Array: [9,12,14,6,15,8,13]",
+      "   ➜ Compare: 14 > 6 (idx 2 > idx 3) → swap",
+      "     Array: [9,12,6,14,15,8,13]",
+      "   ➜ Compare: 12 > 6 (idx 1 > idx 2) → swap",
+      "     Array: [9,6,12,14,15,8,13]",
+      "   ➜ Compare: 9 > 6 (idx 0 > idx 1) → swap",
+      "     Array: [6,9,12,14,15,8,13]",
+      "  Result after Pass 4: [6,9,12,14,15,8,13]",
+      "Pass 5:",
+      "  Current val: 8 (at idx 5). Checking left elements...",
+      "   ➜ Compare: 15 > 8 (idx 4 > idx 5) → swap",
+      "     Array: [6,9,12,14,8,15,13]",
+      "   ➜ Compare: 14 > 8 (idx 3 > idx 4) → swap",
+      "     Array: [6,9,12,8,14,15,13]",
+      "   ➜ Compare: 12 > 8 (idx 2 > idx 3) → swap",
+      "     Array: [6,9,8,12,14,15,13]",
+      "   ➜ Compare: 9 > 8 (idx 1 > idx 2) → swap",
+      "     Array: [6,8,9,12,14,15,13]",
+      "  Result after Pass 5: [6,8,9,12,14,15,13]",
+      "Pass 6:",
+      "  Current val: 13 (at idx 6). Checking left elements...",
+      "   ➜ Compare: 15 > 13 (idx 5 > idx 6) → swap",
+      "     Array: [6,8,9,12,14,13,15]",
+      "   ➜ Compare: 14 > 13 (idx 4 > idx 5) → swap",
+      "     Array: [6,8,9,12,13,14,15]",
+      "  Result after Pass 6: [6,8,9,12,13,14,15]",
+      "Final Sorted Output: [6,8,9,12,13,14,15]",
+    ],
+    edgeCases: [
+      "Already sorted array",
+      "Reverse sorted array",
+      "Single element array",
+      "Array with identical elements",
+    ],
+    tips: [
+      "Efficient for small or nearly sorted arrays.",
+      "Performs well for online input (receives data one by one).",
+      "Stable sorting algorithm.",
+    ],
+    code: `function insertionSort(arr) {
+  let n = arr.length;
+
+  for (let i = 1; i < n; i++) {
+    let j = i;
+
+    // Move left while previous element is greater
+    while (j > 0 && arr[j - 1] > arr[j]) {
+      // swap arr[j-1] and arr[j]
+      let temp = arr[j - 1];
+      arr[j - 1] = arr[j];
+      arr[j] = temp;
+
+      j--;
+    }
+  }
+
+  return arr;
+}`,
+    dryRunFunc: (inputArray) => {
+      const logs = [];
+      let arr = [...inputArray];
+      let n = arr.length;
+      let pass = 1;
+
+      const log = (msg) => logs.push(msg);
+
+      for (let i = 1; i < n; i++) {
+        log(`Pass ${pass}:`);
+        log(
+          `  Current val: ${arr[i]} (at idx ${i}). Checking left elements...`
+        );
+
+        let j = i;
+
+        while (j > 0 && arr[j - 1] > arr[j]) {
+          log(
+            `   ➜ Compare: ${arr[j - 1]} > ${arr[j]} (idx ${
+              j - 1
+            } > idx ${j}) → swap`
+          );
+
+          // Swap
+          let temp = arr[j - 1];
+          arr[j - 1] = arr[j];
+          arr[j] = temp;
+
+          log(`     Array: ${JSON.stringify(arr)}`);
+          j--;
+        }
+
+        if (j === i) {
+          log(`   ➜ No smaller element found. No swaps.`);
+        }
+
+        log(`  Result after Pass ${pass}: ${JSON.stringify(arr)}`);
+        pass++;
+      }
+
+      log(`Final Sorted Output: ${JSON.stringify(arr)}`);
+      return logs;
+    },
+    input: "[14,9,15,12,6,8,13]",
+  },
+  {
+    id: 6,
+    title: "Merge Sort",
+    category: "Sorting",
+    algorithm:
+      "Divide the array into halves, recursively sort each half, then merge the sorted halves.",
+    timeComplexity: "O(n log n)",
+    spaceComplexity: "O(n)",
+    edgeCases: [
+      "Array with identical values",
+      "Already sorted array",
+      "Reverse sorted array",
+      "Single element array",
+    ],
+    tips: [
+      "Merge sort guarantees O(n log n) performance.",
+      "Useful for sorting linked lists.",
+      "Stable and consistent for large datasets.",
+    ],
+    code: `function mergeSort(arr, low, high) {
+  if (low >= high) return;
+
+  let mid = Math.floor((low + high) / 2);
+
+  mergeSort(arr, low, mid);
+  mergeSort(arr, mid + 1, high);
+  merge(arr, low, mid, high);
+
+  return arr;
+}
+
+function merge(arr, low, mid, high) {
+  let temp = [];
+  let left = low;
+  let right = mid + 1;
+
+  while (left <= mid && right <= high) {
+    if (arr[left] <= arr[right]) {
+      temp.push(arr[left++]);
+    } else {
+      temp.push(arr[right++]);
+    }
+  }
+
+  while (left <= mid) temp.push(arr[left++]);
+  while (right <= high) temp.push(arr[right++]);
+
+  for (let i = low; i <= high; i++) {
+    arr[i] = temp[i - low];
+  }
+}`,
+    input: "[3,1,2,4,1,5,2,6,4]",
+    // dryRunFunc: (inputArray) => {
+    //   const logs = [];
+    //   let arr = [...inputArray];
+    //   let pass = 1;
+
+    //   const log = (msg) => logs.push(msg);
+
+    //   // pretty indent for recursion tree
+    //   const indent = (level) => "  ".repeat(level);
+
+    //   const merge = (low, mid, high, level) => {
+    //     log(`${indent(level)}Pass ${pass}:`);
+    //     log(`${indent(level)}  Merging range [${low}..${high}]`);
+
+    //     let temp = [];
+    //     let left = low;
+    //     let right = mid + 1;
+
+    //     // MAIN MERGING LOOP
+    //     while (left <= mid && right <= high) {
+    //       log(
+    //         `${indent(level)}   ➜ Compare ${arr[left]} (L${left}) vs ${arr[right]} (R${right})`
+    //       );
+
+    //       if (arr[left] <= arr[right]) {
+    //         log(`${indent(level)}      pick ${arr[left]} from left`);
+    //         temp.push(arr[left++]);
+    //       } else {
+    //         log(`${indent(level)}      pick ${arr[right]} from right`);
+    //         temp.push(arr[right++]);
+    //       }
+    //     }
+
+    //     // LEFT REMAINING
+    //     while (left <= mid) {
+    //       log(`${indent(level)}   ➜ Left remains → push ${arr[left]} (L${left})`);
+    //       temp.push(arr[left++]);
+    //     }
+
+    //     // RIGHT REMAINING
+    //     while (right <= high) {
+    //       log(`${indent(level)}   ➜ Right remains → push ${arr[right]} (R${right})`);
+    //       temp.push(arr[right++]);
+    //     }
+
+    //     // WRITE BACK
+    //     for (let i = low; i <= high; i++) {
+    //       log(`${indent(level)}   ➜ write ${temp[i - low]} → arr[${i}]`);
+    //       arr[i] = temp[i - low];
+    //     }
+
+    //     log(`${indent(level)}  Result after Pass ${pass}: ${JSON.stringify(arr)}`);
+    //     pass++;
+    //   };
+
+    //   const mergeSort = (low, high, level = 0) => {
+    //     // recursion tree log
+    //     log(`${indent(level)}▶ mergeSort(${low}, ${high})`);
+
+    //     if (low >= high) {
+    //       log(`${indent(level)}  Base case reached.`);
+    //       log(`${indent(level)}◀ return mergeSort(${low}, ${high})`);
+    //       return;
+    //     }
+
+    //     const mid = Math.floor((low + high) / 2);
+    //     log(`${indent(level)}Divide → mid = ${mid}`);
+
+    //     mergeSort(low, mid, level + 1);
+    //     mergeSort(mid + 1, high, level + 1);
+
+    //     merge(low, mid, high, level + 1);
+
+    //     // return log
+    //     log(`${indent(level)}◀ return mergeSort(${low}, ${high})`);
+    //   };
+
+    //   mergeSort(0, arr.length - 1);
+
+    //   logs.push(`Final Sorted Output: ${JSON.stringify(arr)}`);
+    //   return logs;
+    // },
+    dryRunFunc: (inputArray) => {
+      const logs = [];
+      let arr = [...inputArray];
+      let pass = 1;
+
+      const log = (msg) => logs.push(msg);
+
+      const merge = (low, mid, high) => {
+        log(`Pass ${pass}:`);
+        log(`  Merging range [l${low}..h${high}]`);
+
+        let temp = [];
+        let left = low;
+        let right = mid + 1;
+
+        // ————————————————————————
+        // MAIN MERGING LOOP
+        // ————————————————————————
+        while (left <= mid && right <= high) {
+          log(
+            `   ➜ Compare ${arr[left]} (L${left}) vs ${arr[right]} (R${right})`
+          );
+
+          if (arr[left] <= arr[right]) {
+            log(`Left is smaller ➜  pick ${arr[left]} from left (L${left})`);
+            temp.push(arr[left++]);
+          } else {
+            log(
+              `   Right is smaller   ➜ pick ${arr[right]} from right (R${right})`
+            );
+            temp.push(arr[right++]);
+          }
+        }
+
+        // ————————————————————————
+        // LEFT REMAINING
+        // ————————————————————————
+        while (left <= mid) {
+          log(`   ➜ Left has remaining ${arr[left]} (L${left}) → push`);
+          temp.push(arr[left++]);
+        }
+
+        // ————————————————————————
+        // RIGHT REMAINING
+        // ————————————————————————
+        while (right <= high) {
+          log(`   ➜ Right has remaining ${arr[right]} (R${right}) → push`);
+          temp.push(arr[right++]);
+        }
+
+        // ————————————————————————
+        // WRITE BACK
+        // ————————————————————————
+        for (let i = low; i <= high; i++) {
+          log(`   ➜ write ${temp[i - low]} → arr[${i}]`);
+          arr[i] = temp[i - low];
+        }
+
+        log(`  Result after Pass ${pass}: ${JSON.stringify(arr)}`);
+        pass++;
+      };
+
+      const mergeSort = (low, high) => {
+        if (low >= high) return;
+
+        const mid = Math.floor((low + high) / 2);
+        log(`Divide range [l${low}..h${high}] → mid=${mid}`);
+
+        mergeSort(low, mid);
+        mergeSort(mid + 1, high);
+        merge(low, mid, high);
+      };
+
+      mergeSort(0, arr.length - 1);
+
+      logs.push(`Final Sorted Output: ${JSON.stringify(arr)}`);
+
+      return logs;
+    },
+
+    dryRun: [
+      "Divide range [l0..h8] → mid=4",
+      "Divide range [l0..h4] → mid=2",
+      "Divide range [l0..h2] → mid=1",
+      "Divide range [l0..h1] → mid=0",
+      "Pass 1:",
+      "  Merging range [l0..h1]",
+      "   ➜ Compare 3 (L0) vs 1 (R1)",
+      "   Right is smaller   ➜ pick 1 from right (R1)",
+      "   ➜ Left has remaining 3 (L0) → push",
+      "   ➜ write 1 → arr[0]",
+      "   ➜ write 3 → arr[1]",
+      "  Result after Pass 1: [1,3,2,4,1,5,2,6,4]",
+      "Pass 2:",
+      "  Merging range [l0..h2]",
+      "   ➜ Compare 1 (L0) vs 2 (R2)",
+      "Left is smaller ➜  pick 1 from left (L0)",
+      "   ➜ Compare 3 (L1) vs 2 (R2)",
+      "   Right is smaller   ➜ pick 2 from right (R2)",
+      "   ➜ Left has remaining 3 (L1) → push",
+      "   ➜ write 1 → arr[0]",
+      "   ➜ write 2 → arr[1]",
+      "   ➜ write 3 → arr[2]",
+      "  Result after Pass 2: [1,2,3,4,1,5,2,6,4]",
+      "Divide range [l3..h4] → mid=3",
+      "Pass 3:",
+      "  Merging range [l3..h4]",
+      "   ➜ Compare 4 (L3) vs 1 (R4)",
+      "   Right is smaller   ➜ pick 1 from right (R4)",
+      "   ➜ Left has remaining 4 (L3) → push",
+      "   ➜ write 1 → arr[3]",
+      "   ➜ write 4 → arr[4]",
+      "  Result after Pass 3: [1,2,3,1,4,5,2,6,4]",
+      "Pass 4:",
+      "  Merging range [l0..h4]",
+      "   ➜ Compare 1 (L0) vs 1 (R3)",
+      "Left is smaller ➜  pick 1 from left (L0)",
+      "   ➜ Compare 2 (L1) vs 1 (R3)",
+      "   Right is smaller   ➜ pick 1 from right (R3)",
+      "   ➜ Compare 2 (L1) vs 4 (R4)",
+      "Left is smaller ➜  pick 2 from left (L1)",
+      "   ➜ Compare 3 (L2) vs 4 (R4)",
+      "Left is smaller ➜  pick 3 from left (L2)",
+      "   ➜ Right has remaining 4 (R4) → push",
+      "   ➜ write 1 → arr[0]",
+      "   ➜ write 1 → arr[1]",
+      "   ➜ write 2 → arr[2]",
+      "   ➜ write 3 → arr[3]",
+      "   ➜ write 4 → arr[4]",
+      "  Result after Pass 4: [1,1,2,3,4,5,2,6,4]",
+      "Divide range [l5..h8] → mid=6",
+      "Divide range [l5..h6] → mid=5",
+      "Pass 5:",
+      "  Merging range [l5..h6]",
+      "   ➜ Compare 5 (L5) vs 2 (R6)",
+      "   Right is smaller   ➜ pick 2 from right (R6)",
+      "   ➜ Left has remaining 5 (L5) → push",
+      "   ➜ write 2 → arr[5]",
+      "   ➜ write 5 → arr[6]",
+      "  Result after Pass 5: [1,1,2,3,4,2,5,6,4]",
+      "Divide range [l7..h8] → mid=7",
+      "Pass 6:",
+      "  Merging range [l7..h8]",
+      "   ➜ Compare 6 (L7) vs 4 (R8)",
+      "   Right is smaller   ➜ pick 4 from right (R8)",
+      "   ➜ Left has remaining 6 (L7) → push",
+      "   ➜ write 4 → arr[7]",
+      "   ➜ write 6 → arr[8]",
+      "  Result after Pass 6: [1,1,2,3,4,2,5,4,6]",
+      "Pass 7:",
+      "  Merging range [l5..h8]",
+      "   ➜ Compare 2 (L5) vs 4 (R7)",
+      "Left is smaller ➜  pick 2 from left (L5)",
+      "   ➜ Compare 5 (L6) vs 4 (R7)",
+      "   Right is smaller   ➜ pick 4 from right (R7)",
+      "   ➜ Compare 5 (L6) vs 6 (R8)",
+      "Left is smaller ➜  pick 5 from left (L6)",
+      "   ➜ Right has remaining 6 (R8) → push",
+      "   ➜ write 2 → arr[5]",
+      "   ➜ write 4 → arr[6]",
+      "   ➜ write 5 → arr[7]",
+      "   ➜ write 6 → arr[8]",
+      "  Result after Pass 7: [1,1,2,3,4,2,4,5,6]",
+      "Pass 8:",
+      "  Merging range [l0..h8]",
+      "   ➜ Compare 1 (L0) vs 2 (R5)",
+      "Left is smaller ➜  pick 1 from left (L0)",
+      "   ➜ Compare 1 (L1) vs 2 (R5)",
+      "Left is smaller ➜  pick 1 from left (L1)",
+      "   ➜ Compare 2 (L2) vs 2 (R5)",
+      "Left is smaller ➜  pick 2 from left (L2)",
+      "   ➜ Compare 3 (L3) vs 2 (R5)",
+      "   Right is smaller   ➜ pick 2 from right (R5)",
+      "   ➜ Compare 3 (L3) vs 4 (R6)",
+      "Left is smaller ➜  pick 3 from left (L3)",
+      "   ➜ Compare 4 (L4) vs 4 (R6)",
+      "Left is smaller ➜  pick 4 from left (L4)",
+      "   ➜ Right has remaining 4 (R6) → push",
+      "   ➜ Right has remaining 5 (R7) → push",
+      "   ➜ Right has remaining 6 (R8) → push",
+      "   ➜ write 1 → arr[0]",
+      "   ➜ write 1 → arr[1]",
+      "   ➜ write 2 → arr[2]",
+      "   ➜ write 2 → arr[3]",
+      "   ➜ write 3 → arr[4]",
+      "   ➜ write 4 → arr[5]",
+      "   ➜ write 4 → arr[6]",
+      "   ➜ write 5 → arr[7]",
+      "   ➜ write 6 → arr[8]",
+      "  Result after Pass 8: [1,1,2,2,3,4,4,5,6]",
+      "Final Sorted Output: [1,1,2,2,3,4,4,5,6]",
+    ],
+  },
+];
+
+export { dsaAlgorithms, reactQuestionsData };
