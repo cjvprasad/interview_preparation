@@ -2533,5 +2533,5 @@ function quickSortMedian(arr, low, high) {
   },
 ];
 
-export { dsaAlgorithms, reactQuestionsData };
+
 
