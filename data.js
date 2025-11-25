@@ -241,6 +241,97 @@ const reactQuestionsData = [
     output: "Once: 1\nAlways: 1\nAlways: 2",
     category: "JavaScript Core",
   },
+  {
+    id: 94,
+    title: "This Binding Rules (All 7 Rules Explained)",
+    category: "JavaScript Core",
+
+    explanation:
+      "**`this` in JavaScript** depends entirely on **how a function is called**, not where it is written.\n\n" +
+      "JavaScript determines `this` using 7 rules:\n" +
+      "1. **new binding** → `this` = newly created object.\n" +
+      "2. **class constructor** → `this` = instance.\n" +
+      "3. **call/apply/bind** → explicit this.\n" +
+      "4. **method invocation** → object before dot.\n" +
+      "5. **free function call** → global (or undefined in strict mode).\n" +
+      "6. **precedence rules** → new > bind > dot > default.\n" +
+      "7. **arrow functions** → inherit lexical this.",
+
+    tips:
+      '"Interview Tips / Pitfalls"\n' +
+      "* Arrow functions **ignore all this rules** and keep parent's this.\n" +
+      "* `new` has the **highest precedence**.\n" +
+      "* Free functions lose `this` → common bug when extracting methods.\n" +
+      "* bind() does NOT work on arrow functions.\n",
+
+    codeString: `// RULE 1: new binding
+function Person(name) {
+  this.name = name;
+}
+const p = new Person("Jay");
+console.log("1:", p.name); // Jay
+
+
+// RULE 2: class constructor
+class Car {
+  constructor(model) {
+    this.model = model;
+  }
+}
+const c = new Car("Tesla");
+console.log("2:", c.model); // Tesla
+
+
+// RULE 3: call/apply/bind
+function show() {
+  console.log("3:", this.value);
+}
+const obj = { value: 100 };
+show.call(obj); // 100
+
+
+// RULE 4: method invocation (object before dot)
+const user = {
+  name: "Alice",
+  greet() {
+    console.log("4:", this.name);
+  }
+};
+user.greet(); // Alice
+
+
+// RULE 5: free function call (strict mode → undefined)
+"use strict";
+function test() {
+  console.log("5:", this);
+}
+test(); // undefined
+
+
+// RULE 6: precedence (new > call)
+function Demo() {
+  console.log("6:", this.constructor.name);
+}
+// Even though call() is used, new takes priority
+new Demo.call({}); // Demo
+
+
+// RULE 7: arrow function → lexical this
+const arrowObj = {
+  value: 50,
+  arrow: () => console.log("7:", this.value)
+};
+arrowObj.arrow(); // undefined (arrow takes this from global)
+`,
+
+    output: `1: Jay
+2: Tesla
+3: 100
+4: Alice
+5: undefined
+6: Demo
+7: undefined`,
+  },
 
   // REACT FUNDAMENTALS
 
@@ -2532,6 +2623,7 @@ function quickSortMedian(arr, low, high) {
     input: "[4,6,2,5,7,9,1,3]",
   },
 ];
+
 
 
 
