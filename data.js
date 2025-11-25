@@ -104,19 +104,98 @@ const reactQuestionsData = [
     output: "OOP: 15, FP: 15",
   },
   // Q49: `this` keyword explained
-  {
+ {
     id: 49,
-    title: "The `this` Keyword in JavaScript",
+    title: "This Binding Rules (All 7 Rules Explained)",
     category: "JavaScript Core",
 
     explanation:
-      "The value of `this` is determined dynamically by **how a function is called** (the call-site), not where the function is defined.\n\n| Binding Rule | Call-Site Example | `this` Reference |\n|---|---|---|\n| **Default** | `f()` (standalone function call) | `window` (non-strict) or `undefined` (strict mode) |\n| **Implicit** | `obj.f()` (called as a method) | `obj` (the object left of the dot) |\n| **Explicit** | `f.call(obj, ...)` or `f.apply(obj, ...)` | Explicitly forced to `obj` |\n| **New** | `new f()` (constructor call) | The newly created instance object |\n| **Lexical (Arrow Functions)** | N/A | `this` is inherited from the outer scope (cannot be changed) |\n",
-    tips: '"Interview Tips / Pitfalls"\n* **Strict Mode:** Always point out the difference between strict mode (`undefined`) and non-strict mode (`window`) for the default binding.\n* **Arrow Functions:** Emphasize that **arrow functions ignore all four standard rules** and rely solely on lexical binding, making them poor choices for traditional object methods but ideal for callbacks where you want to preserve the surrounding scope\'s `this`.\n',
-    codeString:
-      "\"use strict\";\n\nfunction getThis() { \n  return this; \n}\n\nconst obj = { name: 'Context A', getThis };\n\n// 1. Default Binding (strict mode)\nconsole.log('Default:', typeof getThis() === 'undefined' ? 'undefined' : 'window'); \n\n// 2. Implicit Binding\nconsole.log('Implicit:', obj.getThis().name);\n\n// 3. Explicit Binding\nconst boundThis = getThis.call({ name: 'Context B' });\nconsole.log('Explicit:', boundThis.name);\n\n// 4. Lexical Binding\nconst arrow = () => this; \nconsole.log('Arrow:', typeof arrow() === 'undefined' ? 'undefined' : 'window'); // Inherits outer scope ('window' or 'undefined')\n",
-    output:
-      "Default: undefined\nImplicit: Context A\nExplicit: Context B\nArrow: undefined",
-  }, // Q50: Lexical Environment (JS internals)
+      "**`this` in JavaScript** depends entirely on **how a function is called**, not where it is written.\n\n" +
+      "JavaScript determines `this` using 7 rules:\n" +
+      "1. **new binding** → `this` = newly created object.\n" +
+      "2. **class constructor** → `this` = instance.\n" +
+      "3. **call/apply/bind** → explicit this.\n" +
+      "4. **method invocation** → object before dot.\n" +
+      "5. **free function call** → global (or undefined in strict mode).\n" +
+      "6. **precedence rules** → new > bind > dot > default.\n" +
+      "7. **arrow functions** → inherit lexical this.",
+
+    tips:
+      '"Interview Tips / Pitfalls"\n' +
+      "* Arrow functions **ignore all this rules** and keep parent's this.\n" +
+      "* `new` has the **highest precedence**.\n" +
+      "* Free functions lose `this` → common bug when extracting methods.\n" +
+      "* bind() does NOT work on arrow functions.\n",
+
+    codeString: `// RULE 1: new binding
+function Person(name) {
+  this.name = name;
+}
+const p = new Person("Jay");
+console.log("1:", p.name); // Jay
+
+
+// RULE 2: class constructor
+class Car {
+  constructor(model) {
+    this.model = model;
+  }
+}
+const c = new Car("Tesla");
+console.log("2:", c.model); // Tesla
+
+
+// RULE 3: call/apply/bind
+function show() {
+  console.log("3:", this.value);
+}
+const obj = { value: 100 };
+show.call(obj); // 100
+
+
+// RULE 4: method invocation (object before dot)
+const user = {
+  name: "Alice",
+  greet() {
+    console.log("4:", this.name);
+  }
+};
+user.greet(); // Alice
+
+
+// RULE 5: free function call (strict mode → undefined)
+"use strict";
+function test() {
+  console.log("5:", this);
+}
+test(); // undefined
+
+
+// RULE 6: precedence (new > call)
+function Demo() {
+  console.log("6:", this.constructor.name);
+}
+// Even though call() is used, new takes priority
+new Demo.call({}); // Demo
+
+
+// RULE 7: arrow function → lexical this
+const arrowObj = {
+  value: 50,
+  arrow: () => console.log("7:", this.value)
+};
+arrowObj.arrow(); // undefined (arrow takes this from global)
+`,
+
+    output: `1: Jay
+2: Tesla
+3: 100
+4: Alice
+5: undefined
+6: Demo
+7: undefined`,
+  },
+
   {
     id: 50,
     title: "Lexical Environment (JS Internals)",
@@ -241,98 +320,7 @@ const reactQuestionsData = [
     output: "Once: 1\nAlways: 1\nAlways: 2",
     category: "JavaScript Core",
   },
-  {
-    id: 94,
-    title: "This Binding Rules (All 7 Rules Explained)",
-    category: "JavaScript Core",
-
-    explanation:
-      "**`this` in JavaScript** depends entirely on **how a function is called**, not where it is written.\n\n" +
-      "JavaScript determines `this` using 7 rules:\n" +
-      "1. **new binding** → `this` = newly created object.\n" +
-      "2. **class constructor** → `this` = instance.\n" +
-      "3. **call/apply/bind** → explicit this.\n" +
-      "4. **method invocation** → object before dot.\n" +
-      "5. **free function call** → global (or undefined in strict mode).\n" +
-      "6. **precedence rules** → new > bind > dot > default.\n" +
-      "7. **arrow functions** → inherit lexical this.",
-
-    tips:
-      '"Interview Tips / Pitfalls"\n' +
-      "* Arrow functions **ignore all this rules** and keep parent's this.\n" +
-      "* `new` has the **highest precedence**.\n" +
-      "* Free functions lose `this` → common bug when extracting methods.\n" +
-      "* bind() does NOT work on arrow functions.\n",
-
-    codeString: `// RULE 1: new binding
-function Person(name) {
-  this.name = name;
-}
-const p = new Person("Jay");
-console.log("1:", p.name); // Jay
-
-
-// RULE 2: class constructor
-class Car {
-  constructor(model) {
-    this.model = model;
-  }
-}
-const c = new Car("Tesla");
-console.log("2:", c.model); // Tesla
-
-
-// RULE 3: call/apply/bind
-function show() {
-  console.log("3:", this.value);
-}
-const obj = { value: 100 };
-show.call(obj); // 100
-
-
-// RULE 4: method invocation (object before dot)
-const user = {
-  name: "Alice",
-  greet() {
-    console.log("4:", this.name);
-  }
-};
-user.greet(); // Alice
-
-
-// RULE 5: free function call (strict mode → undefined)
-"use strict";
-function test() {
-  console.log("5:", this);
-}
-test(); // undefined
-
-
-// RULE 6: precedence (new > call)
-function Demo() {
-  console.log("6:", this.constructor.name);
-}
-// Even though call() is used, new takes priority
-new Demo.call({}); // Demo
-
-
-// RULE 7: arrow function → lexical this
-const arrowObj = {
-  value: 50,
-  arrow: () => console.log("7:", this.value)
-};
-arrowObj.arrow(); // undefined (arrow takes this from global)
-`,
-
-    output: `1: Jay
-2: Tesla
-3: 100
-4: Alice
-5: undefined
-6: Demo
-7: undefined`,
-  },
-
+  
   // REACT FUNDAMENTALS
 
   // Q11: React Hooks: useEffect, useMemo, useCallback
@@ -2623,6 +2611,7 @@ function quickSortMedian(arr, low, high) {
     input: "[4,6,2,5,7,9,1,3]",
   },
 ];
+
 
 
 
