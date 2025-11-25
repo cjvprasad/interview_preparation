@@ -104,8 +104,22 @@ const reactQuestionsData = [
     output: "OOP: 15, FP: 15",
   },
   // Q49: `this` keyword explained
- {
+ // Q49: `this` keyword explained
+   {
     id: 49,
+    title: "The `this` Keyword can be bound",
+    category: "JavaScript Core",
+
+    explanation:
+      "The value of `this` is determined dynamically by **how a function is called** (the call-site), not where the function is defined.\n\n| Binding Rule | Call-Site Example | `this` Reference |\n|---|---|---|\n| **Default** | `f()` (standalone function call) | `window` (non-strict) or `undefined` (strict mode) |\n| **Implicit** | `obj.f()` (called as a method) | `obj` (the object left of the dot) |\n| **Explicit** | `f.call(obj, ...)` or `f.apply(obj, ...)` | Explicitly forced to `obj` |\n| **New** | `new f()` (constructor call) | The newly created instance object |\n| **Lexical (Arrow Functions)** | N/A | `this` is inherited from the outer scope (cannot be changed) |\n",
+    tips: '"Interview Tips / Pitfalls"\n* **Strict Mode:** Always point out the difference between strict mode (`undefined`) and non-strict mode (`window`) for the default binding.\n* **Arrow Functions:** Emphasize that **arrow functions ignore all four standard rules** and rely solely on lexical binding, making them poor choices for traditional object methods but ideal for callbacks where you want to preserve the surrounding scope\'s `this`.\n',
+    codeString:
+      "\"use strict\";\n\nfunction getThis() { \n  return this; \n}\n\nconst obj = { name: 'Context A', getThis };\n\n// 1. Default Binding (strict mode)\nconsole.log('Default:', typeof getThis() === 'undefined' ? 'undefined' : 'window'); \n\n// 2. Implicit Binding\nconsole.log('Implicit:', obj.getThis().name);\n\n// 3. Explicit Binding\nconst boundThis = getThis.call({ name: 'Context B' });\nconsole.log('Explicit:', boundThis.name);\n\n// 4. Lexical Binding\nconst arrow = () => this; \nconsole.log('Arrow:', typeof arrow() === 'undefined' ? 'undefined' : 'window'); // Inherits outer scope ('window' or 'undefined')\n",
+    output:
+      "Default: undefined\nImplicit: Context A\nExplicit: Context B\nArrow: undefined",
+  }, 
+  {
+    id: 94,
     title: "This Binding Rules (All 7 Rules Explained)",
     category: "JavaScript Core",
 
@@ -195,7 +209,6 @@ arrowObj.arrow(); // undefined (arrow takes this from global)
 6: Demo
 7: undefined`,
   },
-
   {
     id: 50,
     title: "Lexical Environment (JS Internals)",
@@ -2611,6 +2624,7 @@ function quickSortMedian(arr, low, high) {
     input: "[4,6,2,5,7,9,1,3]",
   },
 ];
+
 
 
 
