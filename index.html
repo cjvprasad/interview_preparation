@@ -3,15 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Fullstack Prep Hub - Premium</title>
+    <title>Fullstack Prep Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <link
-      rel="icon"
-      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>"
-    />
+
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
       rel="stylesheet"
@@ -60,17 +57,14 @@
       }
 
       /* --- SCROLLBAR UTILS --- */
-      /* Hide scrollbar for Chrome, Safari and Opera */
       .no-scrollbar::-webkit-scrollbar {
         display: none;
       }
-      /* Hide scrollbar for IE, Edge and Firefox */
       .no-scrollbar {
-        -ms-overflow-style: none; /* IE and Edge */
-        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none;
+        scrollbar-width: none;
       }
 
-      /* Custom Global Scrollbar */
       ::-webkit-scrollbar {
         width: 6px;
         height: 6px;
@@ -91,7 +85,6 @@
       }
       .card-hover:hover {
         transform: translateY(-4px);
-        box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.15); /* Emerald glow for general */
       }
 
       .vertical-text {
@@ -112,17 +105,12 @@
   </head>
   <body>
     <div id="root"></div>
-
     <script src="./data.js"></script>
     <script src="./design-data.js"></script>
 
     <script type="text/babel">
       const { useState, useMemo, useEffect, useRef } = React;
 
-      // =========================================
-      // 0. DATA INJECTION (SYSTEM DESIGN)
-      // =========================================
-   
       // =========================================
       // 1. ICONS
       // =========================================
@@ -192,7 +180,6 @@
         }
       };
 
-      // Syntax Highlighter Component
       const SyntaxHighLighter = ({
         codeString = "",
         language = "javascript",
@@ -311,7 +298,7 @@
                   ID: {id}
                 </span>
               </div>
-              <h3 className="text-lg font-bold text-white mb-2 group-hover:text-emerald-400 transition leading-tight">
+              <h3 className="text-lg font-bold text-white mb-2 group-hover:text-blue-400 transition leading-tight">
                 {title}
               </h3>
               <p className="text-sm text-slate-400 line-clamp-2 mb-3 font-medium">
@@ -325,9 +312,34 @@
             )}
           </div>
           <div className="absolute right-0 top-0 bottom-0 w-8 bg-slate-800/50 border-l border-slate-700 flex items-center justify-center hover:bg-slate-700 transition">
-            <div className="vertical-text text-[10px] font-bold text-emerald-400 tracking-widest whitespace-nowrap overflow-hidden text-ellipsis">
+            <div className="vertical-text text-[10px] font-bold text-blue-400 tracking-widest whitespace-nowrap overflow-hidden text-ellipsis">
               {category ? category.toUpperCase() : "GENERAL"}
             </div>
+          </div>
+        </div>
+      );
+
+      const QuestionCard = ({ id, title, explanation, category, onClick }) => (
+        <div
+          onClick={onClick}
+          className="group bg-[#1e293b] border border-gray-700 hover:border-blue-500 rounded-xl p-5 cursor-pointer transition-all duration-200 hover:-translate-y-1 shadow-lg card-hover flex flex-col justify-between"
+        >
+          <div className="flex justify-between items-start mb-3 ">
+            <span className="text-xs font-mono text-blue-400 bg-blue-900/20 px-2 py-1 rounded">
+              {category}
+            </span>
+            <span className="text-xs text-gray-600 group-hover:text-blue-400 transition">
+              #{id}
+            </span>
+          </div>
+          <h3 className="text-lg font-bold text-white mb-2 group-hover:text-blue-400 transition text-left">
+            {title}
+          </h3>
+          <p className="text-gray-400 text-sm line-clamp-3 mb-4 text-left">
+            {explanation}
+          </p>
+          <div className="text-xs text-blue-500 font-semibold uppercase tracking-wide group-hover:underline text-left">
+            View Details →
           </div>
         </div>
       );
@@ -416,14 +428,47 @@
       };
 
       const ReactView = ({ initialId }) => {
+        const [search, setSearch] = useState("");
+        const [category, setCategory] = useState("All");
+        const [sortBy, setSortBy] = useState("id");
+        const [sortOrder, setSortOrder] = useState("asc");
         const [selected, setSelected] = useState(null);
-        // Safely fallback if reactQuestionsData is missing
         const data = reactQuestionsData || [];
+        const categories = useMemo(
+          () => ["All", ...new Set(data.map((q) => q.category))],
+          [data]
+        );
 
         useEffect(() => {
           if (initialId && data.length)
             setSelected(data.find((q) => q.id.toString() === initialId));
         }, [initialId, data]);
+
+        const filteredData = useMemo(() => {
+          let res = data.filter((q) => {
+            const matchSearch =
+              q.title.toLowerCase().includes(search.toLowerCase()) ||
+              q.explanation.toLowerCase().includes(search.toLowerCase());
+            const matchCat = category === "All" || q.category === category;
+            return matchSearch && matchCat;
+          });
+          return res.sort((a, b) => {
+            let valA = a[sortBy];
+            let valB = b[sortBy];
+            if (typeof valA === "string") valA = valA.toLowerCase();
+            if (typeof valB === "string") valB = valB.toLowerCase();
+            if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+            if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+            return 0;
+          });
+        }, [data, search, category, sortBy, sortOrder]);
+
+        const handleReset = () => {
+          setSearch("");
+          setCategory("All");
+          setSortBy("id");
+          setSortOrder("asc");
+        };
 
         if (selected)
           return (
@@ -438,21 +483,96 @@
 
         return (
           <div className="animation-fade-in">
+            <header className="mb-8 text-center md:text-left">
+              <h2 className="text-3xl font-bold text-white mb-2 flex items-center justify-center md:justify-start gap-3">
+                <span className="bg-blue-500/20 p-2 rounded-lg text-2xl">
+                  ⚛️
+                </span>{" "}
+                React Concepts
+              </h2>
+              <p className="text-slate-400 max-w-2xl">
+                Master the Virtual DOM, Hooks, Lifecycle methods, and component
+                patterns.
+              </p>
+            </header>
+
+            {/* FILTER BAR */}
+            <div className="bg-slate-800/50 p-5 rounded-xl border border-slate-700 shadow-lg mb-6">
+              <div className="mb-4 relative">
+                <span className="absolute left-3 top-3 text-slate-500">🔍</span>
+                <input
+                  placeholder="Search keywords..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-700 text-white py-2 pl-10 pr-4 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-600"
+                />
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="flex flex-col">
+                  <label className="text-xs text-slate-500 mb-1 ml-1 font-bold">
+                    Category
+                  </label>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="dark-select w-full bg-slate-900 border border-slate-700 text-white py-2 px-3 rounded-lg text-sm focus:border-blue-500 outline-none"
+                  >
+                    {categories.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-xs text-slate-500 mb-1 ml-1 font-bold">
+                    Sort By
+                  </label>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="dark-select w-full bg-slate-900 border border-slate-700 text-white py-2 px-3 rounded-lg text-sm focus:border-blue-500 outline-none"
+                  >
+                    <option value="id">ID</option>
+                    <option value="title">Title</option>
+                  </select>
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-xs text-slate-500 mb-1 ml-1 font-bold">
+                    Order
+                  </label>
+                  <select
+                    value={sortOrder}
+                    onChange={(e) => setSortOrder(e.target.value)}
+                    className="dark-select w-full bg-slate-900 border border-slate-700 text-white py-2 px-3 rounded-lg text-sm focus:border-blue-500 outline-none"
+                  >
+                    <option value="asc">Ascending</option>
+                    <option value="desc">Descending</option>
+                  </select>
+                </div>
+                <div className="flex items-end">
+                  <button
+                    onClick={handleReset}
+                    className="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 py-2 rounded-lg font-bold text-sm transition border border-slate-600"
+                  >
+                    Reset Filters
+                  </button>
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {data.map((q) => (
-                <UniversalCard
+              {filteredData.map((q) => (
+                <QuestionCard
                   key={q.id}
-                  id={q.id}
-                  title={q.title}
-                  subtitle={q.explanation}
-                  category={q.category}
+                  {...q}
                   onClick={() => setSelected(q)}
                 />
               ))}
             </div>
-            {data.length === 0 && (
+            {filteredData.length === 0 && (
               <div className="text-center text-slate-500 py-10">
-                No React data loaded. Ensure data.js is linked.
+                No React data loaded or matching filter.
               </div>
             )}
           </div>
@@ -533,6 +653,24 @@
 
         return (
           <div className="animation-fade-in">
+            <header className="mb-8 text-center md:text-left">
+              <h2 className="text-3xl font-bold text-white mb-2 flex items-center justify-center md:justify-start gap-3">
+                <span className="bg-purple-500/20 p-2 rounded-lg text-2xl">
+                  🧠
+                </span>{" "}
+                Algorithms
+              </h2>
+              <p className="text-slate-400 max-w-2xl">
+                Complexity analysis, edge cases, and dry run logic.
+              </p>
+            </header>
+            {/* Simple Filter for DSA */}
+            <div className="bg-slate-800/50 p-5 rounded-xl border border-slate-700 shadow-lg mb-6">
+              <div className="flex items-center text-slate-400 text-sm">
+                <span className="mr-2">ℹ️</span> Algorithms are usually sorted
+                by complexity or category.
+              </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {data.map((item) => (
                 <UniversalCard
@@ -591,35 +729,155 @@
       };
 
       const DesignView = ({ initialId }) => {
+        const [search, setSearch] = useState("");
+        const [category, setCategory] = useState("All");
+        const [sortBy, setSortBy] = useState("id");
+        const [sortOrder, setSortOrder] = useState("asc");
         const [selected, setSelected] = useState(null);
+
+        const categories = useMemo(
+          () => ["All", ...new Set(DesignData.map((d) => d.category))],
+          []
+        );
+
         useEffect(() => {
           if (initialId)
             setSelected(DesignData.find((d) => d.id.toString() === initialId));
         }, [initialId]);
 
+        const handleBack = () => {
+          setSelected(null);
+          updateURL({ id: null });
+        };
+
+        // RESTORED FILTERS: Filter & Sort Logic for Design
+        const filtered = useMemo(() => {
+          let res = DesignData.filter((item) => {
+            const matchSearch =
+              item.title.toLowerCase().includes(search.toLowerCase()) ||
+              item.explanation.toLowerCase().includes(search.toLowerCase());
+            const matchCat = category === "All" || item.category === category;
+            return matchSearch && matchCat;
+          });
+          // Applying Sort
+          return res.sort((a, b) => {
+            let valA = a[sortBy];
+            let valB = b[sortBy];
+            if (typeof valA === "string") valA = valA.toLowerCase();
+            if (typeof valB === "string") valB = valB.toLowerCase();
+            if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+            if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+            return 0;
+          });
+        }, [search, category, sortBy, sortOrder]);
+
+        const handleReset = () => {
+          setSearch("");
+          setCategory("All");
+          setSortBy("id");
+          setSortOrder("asc");
+        };
+
         if (selected)
-          return (
-            <DesignDetail
-              item={selected}
-              onBack={() => {
-                setSelected(null);
-                updateURL({ id: null });
-              }}
-            />
-          );
+          return <DesignDetail item={selected} onBack={handleBack} />;
 
         return (
-          <div className="animation-fade-in grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {DesignData.map((item) => (
-              <UniversalCard
-                key={item.id}
-                id={item.id}
-                title={item.title}
-                subtitle={item.explanation}
-                category={item.category}
-                onClick={() => setSelected(item)}
-              />
-            ))}
+          <div className="animation-fade-in">
+            <header className="mb-8 text-center md:text-left">
+              <h2 className="text-3xl font-bold text-white mb-2 flex items-center justify-center md:justify-start gap-3">
+                <span className="bg-emerald-500/20 p-2 rounded-lg text-2xl">
+                  📐
+                </span>{" "}
+                System Design & LLD
+              </h2>
+              <p className="text-slate-400 max-w-2xl">
+                Architectural patterns, performance, security, and low-level
+                component design.
+              </p>
+            </header>
+
+            {/* RESTORED FILTER BAR */}
+            <div className="bg-slate-800/50 p-5 rounded-xl border border-slate-700 shadow-lg mb-6">
+              <div className="mb-4 relative">
+                <span className="absolute left-3 top-3 text-slate-500">🔍</span>
+                <input
+                  placeholder="Search system design..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-700 text-white py-2 pl-10 pr-4 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none placeholder:text-slate-600"
+                />
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="flex flex-col">
+                  <label className="text-xs text-slate-500 mb-1 ml-1 font-bold">
+                    Category
+                  </label>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="dark-select w-full bg-slate-900 border border-slate-700 text-white py-2 px-3 rounded-lg text-sm focus:border-emerald-500 outline-none"
+                  >
+                    {categories.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-xs text-slate-500 mb-1 ml-1 font-bold">
+                    Sort By
+                  </label>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="dark-select w-full bg-slate-900 border border-slate-700 text-white py-2 px-3 rounded-lg text-sm focus:border-emerald-500 outline-none"
+                  >
+                    <option value="id">ID</option>
+                    <option value="title">Title</option>
+                  </select>
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-xs text-slate-500 mb-1 ml-1 font-bold">
+                    Order
+                  </label>
+                  <select
+                    value={sortOrder}
+                    onChange={(e) => setSortOrder(e.target.value)}
+                    className="dark-select w-full bg-slate-900 border border-slate-700 text-white py-2 px-3 rounded-lg text-sm focus:border-emerald-500 outline-none"
+                  >
+                    <option value="asc">Ascending</option>
+                    <option value="desc">Descending</option>
+                  </select>
+                </div>
+                <div className="flex items-end">
+                  <button
+                    onClick={handleReset}
+                    className="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 py-2 rounded-lg font-bold text-sm transition border border-slate-600"
+                  >
+                    Reset Filters
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filtered.map((item) => (
+                <UniversalCard
+                  key={item.id}
+                  id={item.id}
+                  title={item.title}
+                  subtitle={item.explanation}
+                  category={item.category}
+                  onClick={() => setSelected(item)}
+                />
+              ))}
+            </div>
+            {filtered.length === 0 && (
+              <div className="text-center text-slate-500 py-10">
+                No matching topics found.
+              </div>
+            )}
           </div>
         );
       };
