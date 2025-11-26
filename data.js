@@ -104,8 +104,7 @@ const reactQuestionsData = [
     output: "OOP: 15, FP: 15",
   },
   // Q49: `this` keyword explained
- // Q49: `this` keyword explained
-   {
+  {
     id: 49,
     title: "The `this` Keyword can be bound",
     category: "JavaScript Core",
@@ -117,7 +116,7 @@ const reactQuestionsData = [
       "\"use strict\";\n\nfunction getThis() { \n  return this; \n}\n\nconst obj = { name: 'Context A', getThis };\n\n// 1. Default Binding (strict mode)\nconsole.log('Default:', typeof getThis() === 'undefined' ? 'undefined' : 'window'); \n\n// 2. Implicit Binding\nconsole.log('Implicit:', obj.getThis().name);\n\n// 3. Explicit Binding\nconst boundThis = getThis.call({ name: 'Context B' });\nconsole.log('Explicit:', boundThis.name);\n\n// 4. Lexical Binding\nconst arrow = () => this; \nconsole.log('Arrow:', typeof arrow() === 'undefined' ? 'undefined' : 'window'); // Inherits outer scope ('window' or 'undefined')\n",
     output:
       "Default: undefined\nImplicit: Context A\nExplicit: Context B\nArrow: undefined",
-  }, 
+  },
   {
     id: 94,
     title: "This Binding Rules (All 7 Rules Explained)",
@@ -208,7 +207,7 @@ arrowObj.arrow(); // undefined (arrow takes this from global)
 5: undefined
 6: Demo
 7: undefined`,
-  },
+  }, // Q50: Lexical Environment (JS internals)
   {
     id: 50,
     title: "Lexical Environment (JS Internals)",
@@ -333,7 +332,7 @@ arrowObj.arrow(); // undefined (arrow takes this from global)
     output: "Once: 1\nAlways: 1\nAlways: 2",
     category: "JavaScript Core",
   },
-  
+
   // REACT FUNDAMENTALS
 
   // Q11: React Hooks: useEffect, useMemo, useCallback
@@ -1297,6 +1296,154 @@ arrowObj.arrow(); // undefined (arrow takes this from global)
     output:
       "toString(): 5,20,3,10\njoin(): 5 | 20 | 3 | 10\nconcat(): [5, 20, 3, 10, 1, 2]\nArray.from(): ['a', 'b', 'c']\n// ... (full console output from Q82)",
   },
+  // --- JAVASCRIPT OBJECTS & INTERNALS ---
+  // Q95: Object.freeze vs Object.seal
+  {
+    id: 95,
+    title: "Immutability: Object.freeze() vs Object.seal()",
+    category: "JavaScript Core",
+    explanation:
+      "These methods restrict how objects can be modified.\n\n* **`Object.freeze(obj)`:** The highest level of immutability. You **cannot** add, remove, or modify existing properties. The object becomes completely read-only (shallowly).\n* **`Object.seal(obj)`:** You **cannot** add or remove properties, BUT you **can** modify the values of existing properties.\n* **`Object.preventExtensions(obj)`:** You **cannot** add new properties, but you can remove or modify existing ones.",
+    tips: '"Interview Tips"\n* **Deep Freeze:** Remember that these methods are **shallow**. Freezing an object does not freeze objects nested inside it. You need a recursive function to achieve a "Deep Freeze".\n* **Strict Mode:** In strict mode (`"use strict"`), attempting to modify a frozen object throws an error; otherwise, it fails silently.',
+    codeString:
+      "const user = { name: 'Jay', meta: { age: 25 } };\n\n// 1. Object.seal\nObject.seal(user);\nuser.name = 'Roy'; // ✅ Allowed (Modified)\nuser.city = 'NY';  // ❌ Ignored (Cannot add)\ndelete user.name;  // ❌ Ignored (Cannot delete)\n\n// 2. Object.freeze\nObject.freeze(user);\nuser.name = 'Sam'; // ❌ Ignored (Cannot modify)\nuser.meta.age = 30; // ✅ Allowed (Nested objects are NOT frozen)\n\nconsole.log('Final:', user);",
+    output: "Final: { name: 'Roy', meta: { age: 30 } }",
+  },
+
+  // Q96: Generators and Iterators
+  {
+    id: 96,
+    title: "Generators and Iterators (function*)",
+    category: "JavaScript Core",
+    explanation:
+      "**Generators** are functions that can be paused and resumed. They are declared with `function*` and use the `yield` keyword.\n\nWhen called, a generator does not execute code immediately; instead, it returns an **Iterator** object. Calling `.next()` on the iterator executes code until the next `yield`, returning `{ value: Any, done: Boolean }`.",
+    tips: '"Interview Tips"\n* **Use Cases:** Generators are great for implementing custom iterables, state machines, or handling infinite data streams without crashing memory.\n* **Async Flows:** Libraries like `redux-saga` use generators to handle complex asynchronous flows effectively.',
+    codeString:
+      "function* idGenerator() {\n  let id = 1;\n  while (true) {\n    yield id++; // Pauses here and returns id\n  }\n}\n\nconst gen = idGenerator();\n\nconsole.log(gen.next()); // { value: 1, done: false }\nconsole.log(gen.next()); // { value: 2, done: false }\nconsole.log(gen.next()); // { value: 3, done: false }",
+    output:
+      "{ value: 1, done: false }\n{ value: 2, done: false }\n{ value: 3, done: false }",
+  },
+
+  // Q97: WeakMap vs Map
+  {
+    id: 97,
+    title: "Map vs WeakMap (Garbage Collection)",
+    category: "JavaScript Core",
+    explanation:
+      "**`Map`**: Keys can be any type. Strong references are held to keys, preventing Garbage Collection (GC) even if the key is no longer used elsewhere.\n\n**`WeakMap`**: Keys **must** be Objects. References to keys are **weak**. If the object used as a key has no other references in the application, it will be garbage collected, and the entry is automatically removed from the WeakMap.",
+    tips: '"Interview Tips"\n* **Enumerability:** `WeakMap` is **not enumerable** (you cannot loop over it with `forEach` or `for...of`) because the GC could remove items at any moment.\n* **Use Case:** DOM Node metadata storage (if the node is removed from DOM, the memory is freed) or private data in classes.',
+    codeString:
+      "let obj = { id: 1 };\n\n// 1. Map (Strong Reference)\nconst map = new Map();\nmap.set(obj, 'Data');\n// If we do: obj = null;\n// The {id:1} object stays in memory because 'map' holds it.\n\n// 2. WeakMap (Weak Reference)\nconst weakMap = new WeakMap();\nweakMap.set(obj, 'Private Data');\n\nobj = null; \n// Now, {id:1} is eligible for Garbage Collection.\n// It is automatically removed from weakMap (eventually).\n\nconsole.log('WeakMap logic is handled by JS Engine GC.');",
+    output: "WeakMap logic is handled by JS Engine GC.",
+  },
+
+  // --- JAVASCRIPT SECURITY & WEB APIs ---
+
+  // Q98: Security: XSS vs CSRF
+  {
+    id: 98,
+    title: "Web Security: XSS vs CSRF",
+    category: "Browser & Web APIs",
+    explanation:
+      "**XSS (Cross-Site Scripting):** Attackers inject malicious scripts into web pages viewed by other users (e.g., in a comment section). The script runs in the victim's browser, often stealing cookies/tokens.\n* *Prevention:* Sanitize user input, use `HttpOnly` cookies, implement **CSP** (Content Security Policy).\n\n**CSRF (Cross-Site Request Forgery):** Attackers trick a user into executing unwanted actions on a web application where they are currently authenticated (e.g., a hidden form on a malicious site submits a bank transfer request).\n* *Prevention:* Use **CSRF Tokens**, `SameSite` cookie attribute.",
+    tips: '"Interview Tips"\n* **CSP:** Explain Content Security Policy headers as a powerful tool to restrict where scripts can be loaded from, effectively neutralizing many XSS attacks.\n* **React:** React automatically escapes content in JSX, preventing most XSS, unless you use `dangerouslySetInnerHTML`.',
+    codeString:
+      "// Conceptual Prevention\n\n// 1. XSS Prevention (React)\n// React escapes this automatically:\nconst userInput = '<script>alert(1)</script>';\nconst element = <div>{userInput}</div>; // Renders as text, not script\n\n// 2. CSRF Prevention (Cookie Attribute)\n// Set-Cookie: session_id=xyz; SameSite=Strict; Secure\n",
+    output: "Conceptual Security Examples",
+  },
+
+  // Q99: Event Bubbling vs Capturing
+  {
+    id: 99,
+    title: "Event Propagation: Bubbling vs Capturing",
+    category: "Browser & Web APIs",
+    explanation:
+      "When an event occurs on a DOM element, it travels through three phases:\n1. **Capturing Phase:** The event goes down from `window` → `document` → ... → `target`.\n2. **Target Phase:** The event reaches the element.\n3. **Bubbling Phase:** The event goes up from `target` → ... → `document` → `window`.\n\nBy default, `addEventListener` listens to the **Bubbling** phase. You can listen to the Capturing phase by passing `{ capture: true }` as the third argument.",
+    tips: '"Interview Tips"\n* **stopPropagation:** `e.stopPropagation()` stops the event from moving further in the current phase (Bubbling or Capturing).\n* **Delegation:** Event delegation relies on Bubbling.',
+    codeString:
+      "// HTML: <div id='parent'><button id='child'>Click</button></div>\n\n/*\ndocument.getElementById('parent').addEventListener('click', () => {\n  console.log('Parent Captured');\n}, true); // true = Capturing Phase\n\ndocument.getElementById('child').addEventListener('click', () => {\n  console.log('Child Clicked');\n});\n\ndocument.getElementById('parent').addEventListener('click', () => {\n  console.log('Parent Bubbled');\n});\n*/\n// Order of logs: Parent Captured -> Child Clicked -> Parent Bubbled",
+    output: "Parent Captured\nChild Clicked\nParent Bubbled",
+  },
+
+  // --- REACT ADVANCED & ARCHITECTURE ---
+
+  // Q99: React Portals
+  {
+    id: 99,
+    title: "React Portals (ReactDOM.createPortal)",
+    category: "React Fundamentals",
+    explanation:
+      "Portals provide a way to render children into a DOM node that exists **outside** the DOM hierarchy of the parent component.\n\nCommon Use Cases:\n* Modals / Dialogs\n* Tooltips\n* Floating Menus\n\nEven though the portal is rendered elsewhere in the DOM, it behaves like a normal React child for **event bubbling** and context. An event fired inside a portal will bubble up to the React parent, even if the DOM parent is different.",
+    tips: '"Interview Tips"\n* Ask: "If I click a button inside a Portal, does the event bubble to the React component that rendered the Portal?" **Answer: Yes.** This is a key feature of Portals.',
+    codeString:
+      "import ReactDOM from 'react-dom';\n\nfunction Modal({ children, isOpen }) {\n  if (!isOpen) return null;\n  \n  // Render into a div with id='modal-root' (defined in index.html)\n  return ReactDOM.createPortal(\n    <div className=\"modal\">\n      {children}\n    </div>,\n    document.getElementById('modal-root')\n  );\n}",
+    output: "Conceptual Portal Code",
+  },
+
+  // Q100: Error Boundaries
+  {
+    id: 100,
+    title: "Error Boundaries",
+    category: "React Fundamentals",
+    explanation:
+      "Error Boundaries are **Class Components** that catch JavaScript errors anywhere in their child component tree, log those errors, and display a fallback UI instead of the component tree that crashed.\n\nRequired Lifecycle Methods:\n* **`static getDerivedStateFromError(error)`**: Update state to show fallback UI.\n* **`componentDidCatch(error, info)`**: Log error information.",
+    tips: '"Interview Tips"\n* **Limitations:** Error Boundaries **do not** catch errors in: Event handlers, Async code (setTimeout), SSR, or errors thrown in the boundary itself.\n* currently, there is **no Hook equivalent** for Error Boundaries; you must use a class component.',
+    codeString:
+      "class ErrorBoundary extends React.Component {\n  state = { hasError: false };\n\n  static getDerivedStateFromError(error) {\n    return { hasError: true };\n  }\n\n  componentDidCatch(error, info) {\n    console.log('Logged:', error, info);\n  }\n\n  render() {\n    if (this.state.hasError) {\n      return <h1>Something went wrong.</h1>;\n    }\n    return this.props.children;\n  }\n}",
+    output: "Conceptual Error Boundary Class",
+  },
+
+  // Q101: forwardRef and useImperativeHandle
+  {
+    id: 101,
+    title: "forwardRef and useImperativeHandle",
+    category: "React Fundamentals",
+    explanation:
+      "**`forwardRef`**: React components do not pass the `ref` attribute to their children by default. `forwardRef` allows a component to take a `ref` passed to it and forward it down to a specific DOM node (or class component) inside it.\n\n**`useImperativeHandle`**: Customizes the instance value that is exposed to parent components when using `ref`. Instead of exposing the raw DOM node, you can expose specific methods (e.g., `focus`, `scroll`).",
+    tips: '"Interview Tips"\n* **Controlled vs Uncontrolled:** Accessing DOM nodes via refs is an "escape hatch." Prefer controlled state, but use refs for focus management, media playback, or integrating with third-party DOM libraries.',
+    codeString:
+      "const CustomInput = React.forwardRef((props, ref) => {\n  const localRef = React.useRef();\n  \n  React.useImperativeHandle(ref, () => ({\n    alertHi: () => alert('Hi'),\n    focus: () => localRef.current.focus()\n  }));\n\n  return <input ref={localRef} placeholder=\"Type here\" />;\n});\n\n// Usage in Parent\n// const ref = useRef();\n// <CustomInput ref={ref} />\n// ref.current.alertHi();",
+    output: "Conceptual forwardRef Code",
+  },
+
+  // Q102: HOCs vs Render Props
+  {
+    id: 102,
+    title: "Higher-Order Components (HOC) vs Render Props",
+    category: "React Fundamentals",
+    explanation:
+      "Before Hooks, these were the primary patterns for logic reuse.\n\n**HOC**: A function that takes a component and returns a new component with additional props/logic. (e.g., `withRouter(Component)`).\n* *Cons:* Prop collisions, wrapper hell.\n\n**Render Props**: A component with a prop (usually named `render` or `children`) that is a function. The component calls this function with its internal state. (e.g., `<Mouse render={({ x, y }) => ...} />`).\n* *Cons:* Callback hell (nesting).",
+    tips: '"Interview Tips"\n* **Modern View:** **Custom Hooks** have largely replaced both patterns for logic reuse because they don\'t add nesting to the component tree. However, Render Props are still useful for pure rendering logic (like virtualization libraries).',
+    codeString:
+      "// 1. HOC Pattern\nconst withUser = (Component) => (props) => (\n  <Component {...props} user=\"Jay\" />\n);\n\n// 2. Render Prop Pattern\nconst UserProvider = ({ children }) => children('Jay');\n\n// Usage\n// <UserProvider>{user => <div>{user}</div>}</UserProvider>",
+    output: "Conceptual Patterns",
+  },
+
+  // Q103: Controlled vs Uncontrolled Components
+  {
+    id: 103,
+    title: "Controlled vs Uncontrolled Components",
+    category: "React Fundamentals",
+    explanation:
+      "**Controlled Component:** The form data is handled by the **React component state**. The source of truth is React state.\n* *Mechanism:* `value={state}` and `onChange={setState}`.\n\n**Uncontrolled Component:** The form data is handled by the **DOM** itself. The source of truth is the DOM.\n* *Mechanism:* `ref` to access values and `defaultValue` for initialization.",
+    tips: '"Interview Tips"\n* **Validation:** Controlled components enable instant validation (as you type). Uncontrolled components are better for non-React integration or extremely simple forms where re-renders on every keystroke cause performance issues.',
+    codeString:
+      "// Controlled\nconst [val, setVal] = useState('');\n<input value={val} onChange={e => setVal(e.target.value)} />\n\n// Uncontrolled\nconst ref = useRef();\n<input ref={ref} defaultValue=\"default\" />\n// Read via ref.current.value on submit",
+    output: "Conceptual Form Patterns",
+  },
+
+  // Q104: React Fiber & Synthetic Events
+  {
+    id: 104,
+    title: "React Architecture: Fiber & Synthetic Events",
+    category: "React Fundamentals",
+    explanation:
+      "**React Fiber:** The reconciliation engine introduced in React 16. It allows rendering to be split into chunks (**Time Slicing**), capable of pausing and prioritizing work. This enables features like Suspense and Concurrent Mode.\n\n**Synthetic Events:** React implements its own event system that wraps native browser events. This ensures consistent behavior across different browsers (cross-browser compatibility) and optimizes performance via event delegation.",
+    tips: '"Interview Tips"\n* **Event Pooling:** Note that before React 17, Synthetic Events were "pooled" (nulled out) for performance. **React 17+ removed event pooling**, so you no longer need `e.persist()` to use events async.',
+    codeString:
+      "// Synthetic Event Example\n<button onClick={(e) => {\n  console.log(e.nativeEvent); // Access original DOM event\n  console.log(e.target);      // React wrapper\n}}>Click</button>",
+    output: "Conceptual Architecture",
+  },
 ];
 const dsaAlgorithms = [
   {
@@ -2188,7 +2335,8 @@ function merge(arr, low, mid, high) {
       "  Result after Pass 8: [1,1,2,2,3,4,4,5,6]",
       "Final Sorted Output: [1,1,2,2,3,4,4,5,6]",
     ],
-  },{
+  },
+  {
     id: 7,
     title: "Quick Sort (First Element Pivot)",
     category: "Sorting",
@@ -2624,9 +2772,3 @@ function quickSortMedian(arr, low, high) {
     input: "[4,6,2,5,7,9,1,3]",
   },
 ];
-
-
-
-
-
-
