@@ -3,12 +3,15 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Fullstack Prep Hub</title>
+    <title>Fullstack Prep Hub - Premium</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>"
+    />
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
       rel="stylesheet"
@@ -18,13 +21,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-jsx.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+
     <style>
       @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
 
       :root {
         --bg-dark: #0f172a;
         --card-dark: #1e293b;
-        --accent: #3b82f6;
       }
 
       body {
@@ -34,17 +37,50 @@
         margin: 0;
       }
 
-      /* Custom Scrollbar */
+      /* --- PREMIUM ANIMATIONS --- */
+      @keyframes premiumTabEnter {
+        0% {
+          opacity: 0;
+          transform: translateY(12px) scale(0.99);
+          filter: blur(4px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+          filter: blur(0);
+        }
+      }
+
+      .animate-tab-content {
+        animation: premiumTabEnter 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      }
+
+      .animation-fade-in {
+        animation: premiumTabEnter 0.4s ease-out forwards;
+      }
+
+      /* --- SCROLLBAR UTILS --- */
+      /* Hide scrollbar for Chrome, Safari and Opera */
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      /* Hide scrollbar for IE, Edge and Firefox */
+      .no-scrollbar {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+      }
+
+      /* Custom Global Scrollbar */
       ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
+        width: 6px;
+        height: 6px;
       }
       ::-webkit-scrollbar-track {
-        background: #0f172a;
+        background: transparent;
       }
       ::-webkit-scrollbar-thumb {
         background: #334155;
-        border-radius: 4px;
+        border-radius: 10px;
       }
       ::-webkit-scrollbar-thumb:hover {
         background: #475569;
@@ -55,8 +91,7 @@
       }
       .card-hover:hover {
         transform: translateY(-4px);
-        border-color: #3b82f6;
-        box-shadow: 0 10px 30px -10px rgba(59, 130, 246, 0.3);
+        box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.15); /* Emerald glow for general */
       }
 
       .vertical-text {
@@ -65,22 +100,6 @@
         transform: rotate(180deg);
       }
 
-      .animation-fade-in {
-        animation: fadeIn 0.4s ease-out forwards;
-      }
-
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(10px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      /* Custom Select Arrow */
       .dark-select {
         appearance: none;
         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
@@ -93,11 +112,17 @@
   </head>
   <body>
     <div id="root"></div>
+
     <script src="./data.js"></script>
+    <script src="./design-data.js"></script>
 
     <script type="text/babel">
-      const { useState, useMemo, useEffect } = React;
+      const { useState, useMemo, useEffect, useRef } = React;
 
+      // =========================================
+      // 0. DATA INJECTION (SYSTEM DESIGN)
+      // =========================================
+   
       // =========================================
       // 1. ICONS
       // =========================================
@@ -117,7 +142,6 @@
           {children}
         </svg>
       );
-
       const ChevronLeft = (p) => (
         <IconBase {...p}>
           <path d="m15 18-6-6 6-6" />
@@ -131,35 +155,6 @@
       const ChevronDown = (p) => (
         <IconBase {...p}>
           <path d="m6 9 6 6 6-6" />
-        </IconBase>
-      );
-      const Sun = (p) => (
-        <IconBase {...p}>
-          <circle cx="12" cy="12" r="4" />
-          <path d="M12 2v2" />
-          <path d="M12 20v2" />
-          <path d="m4.93 4.93 1.41 1.41" />
-          <path d="m17.66 17.66 1.41 1.41" />
-          <path d="M2 12h2" />
-          <path d="M20 12h2" />
-          <path d="m6.34 17.66-1.41 1.41" />
-          <path d="m19.07 4.93-1.41 1.41" />
-        </IconBase>
-      );
-      const Moon = (p) => (
-        <IconBase {...p}>
-          <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
-        </IconBase>
-      );
-      const Copy = (p) => (
-        <IconBase {...p}>
-          <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-          <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-        </IconBase>
-      );
-      const Check = (p) => (
-        <IconBase {...p}>
-          <path d="M20 6 9 17l-5-5" />
         </IconBase>
       );
       const Play = (p) => (
@@ -180,35 +175,24 @@
           <line x1="12" x2="12.01" y1="16" y2="16" />
         </IconBase>
       );
-      const Filter = (p) => (
-        <IconBase {...p}>
-          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
-        </IconBase>
-      );
 
       // =========================================
-      // 2. UTILS
+      // 2. UTILS & SHARED COMPONENTS
       // =========================================
       const updateURL = (params) => {
         try {
-          const url = new URL(window.location);
+          const url = new URL(location);
           Object.keys(params).forEach((key) => {
-            if (params[key] === null) {
-              url.searchParams.delete(key);
-            } else {
-              url.searchParams.set(key, params[key]);
-            }
+            if (params[key] === null) url.searchParams.delete(key);
+            else url.searchParams.set(key, params[key]);
           });
-          window.history.pushState({}, "", url);
+          history.pushState({}, "", url);
         } catch (e) {
-          console.warn("URL update skipped (likely sandbox).");
+          console.warn("URL update skipped.");
         }
       };
 
-      // =========================================
-      // 3. SHARED COMPONENTS
-      // =========================================
-
+      // Syntax Highlighter Component
       const SyntaxHighLighter = ({
         codeString = "",
         language = "javascript",
@@ -218,101 +202,57 @@
         const [isDark, setIsDark] = useState(true);
 
         useEffect(() => {
-          const themeLink = document.getElementById("prism-theme-link");
-          if (themeLink) {
-            themeLink.href = isDark
-              ? "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
-              : "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css";
-          }
-          if (window.Prism) window.Prism.highlightAll();
-        }, [isDark, codeString]);
+          if (Prism) Prism.highlightAll();
+        }, [codeString, isDark]);
 
         const handleCopy = async () => {
-          try {
-            await navigator.clipboard.writeText(codeString || output || "");
-            setCopied(true);
-            setTimeout(() => setCopied(false), 1500);
-          } catch (err) {
-            console.error("Failed to copy:", err);
-          }
-        };
-
-        const styles = {
-          container: {
-            position: "relative",
-            borderRadius: 8,
-            overflow: "hidden",
-            fontFamily: "monospace",
-            marginTop: 10,
-            marginBottom: 10,
-            transition: "all 0.3s ease",
-            border: isDark ? "1px solid #334155" : "1px solid #ccc",
-            maxWidth: "100%",
-            minWidth: 0,
-          },
-          header: {
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "6px 12px",
-            fontSize: 13,
-            borderBottom: isDark ? "1px solid #333" : "1px solid #ddd",
-          },
-
-          language: {
-            opacity: 0.8,
-
-            letterSpacing: "0.5px",
-
-            fontWeight: "bold",
-          },
-
-          button: {
-            background: "transparent",
-            border: `1px solid ${isDark ? "#666" : "#999"}`,
-            padding: "2px 8px",
-            borderRadius: 4,
-            cursor: "pointer",
-            fontSize: 12,
-            marginLeft: 8,
-            transition: "all 0.2s ease",
-            color: isDark ? "#fff" : "#333",
-          },
+          await navigator.clipboard.writeText(codeString || output || "");
+          setCopied(true);
+          setTimeout(() => setCopied(false), 1500);
         };
 
         return (
           <div
             style={{
-              ...styles.container,
+              position: "relative",
+              borderRadius: 8,
+              overflow: "hidden",
+              fontFamily: "monospace",
+              marginTop: 10,
+              marginBottom: 10,
+              border: isDark ? "1px solid #334155" : "1px solid #ccc",
               backgroundColor: isDark ? "#2d2d2d" : "#f5f5f5",
               color: isDark ? "#fff" : "#000",
             }}
           >
             <div
               style={{
-                ...styles.header,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "6px 12px",
                 background: isDark ? "#1e1e1e" : "#e6e6e6",
-                color: isDark ? "#fff" : "#000",
+                borderBottom: isDark ? "1px solid #333" : "1px solid #ddd",
+                fontSize: 13,
               }}
             >
-              <span
-                style={{
-                  opacity: 0.8,
-                  letterSpacing: "0.5px",
-                  fontWeight: "bold",
-                }}
-              >
+              <span style={{ fontWeight: "bold", opacity: 0.8 }}>
                 {language.toUpperCase()}
               </span>
               <div style={{ display: "flex" }}>
-                <button onClick={handleCopy} style={styles.button}>
-                  {copied ? "✅ Copied!" : "📋 Copy"}
-                </button>
                 <button
-                  onClick={() => setIsDark((prev) => !prev)}
-                  style={styles.button}
+                  onClick={handleCopy}
+                  style={{
+                    background: "transparent",
+                    border: `1px solid ${isDark ? "#666" : "#999"}`,
+                    padding: "2px 8px",
+                    borderRadius: 4,
+                    cursor: "pointer",
+                    fontSize: 12,
+                    color: isDark ? "#fff" : "#333",
+                  }}
                 >
-                  {isDark ? "🌞 Light" : "🌙 Dark"}
+                  {copied ? "✅" : "📋"}
                 </button>
               </div>
             </div>
@@ -330,7 +270,6 @@
                 style={{
                   background: isDark ? "#1e1e1e" : "#fafafa",
                   color: isDark ? "#00ff88" : "#333",
-                  fontFamily: "monospace",
                   padding: "12px",
                   borderTop: isDark ? "1px solid #444" : "1px solid #ddd",
                   fontSize: "12px",
@@ -344,11 +283,9 @@
                     color: isDark ? "#4ade80" : "#15803d",
                   }}
                 >
-                  Console Output:
+                  Output:
                 </strong>
-                <pre style={{ margin: 0, whiteSpace: "pre-wrap" }}>
-                  {output}
-                </pre>
+                <pre style={{ margin: 0 }}>{output}</pre>
               </div>
             )}
           </div>
@@ -365,7 +302,7 @@
       }) => (
         <div
           onClick={onClick}
-          className="relative group card-hover bg-[#1e293b] border border-slate-700 rounded-xl shadow-md cursor-pointer overflow-hidden h-full min-h-[180px] transition-all duration-300"
+          className="relative group card-hover bg-[#1e293b] border border-slate-700 rounded-xl shadow-md cursor-pointer overflow-hidden h-full min-h-[180px]"
         >
           <div className="p-5 pr-12 flex flex-col h-full justify-between">
             <div>
@@ -374,7 +311,7 @@
                   ID: {id}
                 </span>
               </div>
-              <h3 className="text-lg font-bold text-white mb-2 group-hover:text-blue-400 transition leading-tight">
+              <h3 className="text-lg font-bold text-white mb-2 group-hover:text-emerald-400 transition leading-tight">
                 {title}
               </h3>
               <p className="text-sm text-slate-400 line-clamp-2 mb-3 font-medium">
@@ -388,44 +325,13 @@
             )}
           </div>
           <div className="absolute right-0 top-0 bottom-0 w-8 bg-slate-800/50 border-l border-slate-700 flex items-center justify-center hover:bg-slate-700 transition">
-            <div
-              className="vertical-text text-[10px] font-bold text-blue-400 tracking-widest whitespace-nowrap overflow-hidden text-ellipsis"
-              title={category}
-            >
-              {category.toUpperCase()}
+            <div className="vertical-text text-[10px] font-bold text-emerald-400 tracking-widest whitespace-nowrap overflow-hidden text-ellipsis">
+              {category ? category.toUpperCase() : "GENERAL"}
             </div>
           </div>
         </div>
       );
 
-      const QuestionCard = ({ id, title, explanation, category, onClick }) => (
-        <div
-          onClick={onClick}
-          className="group bg-[#1e293b] border border-gray-700 hover:border-blue-500 rounded-xl p-5 cursor-pointer transition-all duration-200 hover:-translate-y-1 shadow-lg card-hover flex flex-col justify-between"
-        >
-          <div className="flex justify-between items-start mb-3 ">
-            <span className="text-xs font-mono text-blue-400 bg-blue-900/20 px-2 py-1 rounded">
-              {category}
-            </span>
-            <span className="text-xs text-gray-600 group-hover:text-blue-400 transition">
-              #{id}
-            </span>
-          </div>
-          <h3 className="text-lg font-bold text-white mb-2 group-hover:text-blue-400 transition text-left">
-            {title}
-          </h3>
-          <p className="text-gray-400 text-sm line-clamp-3 mb-4 text-left">
-            {explanation}
-          </p>
-          <div className="text-xs text-blue-500 font-semibold uppercase tracking-wide group-hover:underline text-left">
-            View Details →
-          </div>
-        </div>
-      );
-
-      // =========================================
-      // 4. LOG VIEWER COMPONENTS
-      // =========================================
       const LogViewer = ({ logs }) => {
         const groupedLogs = useMemo(() => {
           if (!logs || logs.length === 0) return [];
@@ -438,8 +344,7 @@
               if (currentGroup) groups.push(currentGroup);
               currentGroup = { title: log, items: [] };
             } else {
-              if (!currentGroup)
-                currentGroup = { title: "Initialization / Setup", items: [] };
+              if (!currentGroup) currentGroup = { title: "Log", items: [] };
               currentGroup.items.push(log);
             }
           });
@@ -448,478 +353,158 @@
         }, [logs]);
 
         return (
-          <div className="space-y-2 font-mono text-sm text-slate-300 max-h-[500px] overflow-y-auto pr-2">
-            {groupedLogs.length > 0 ? (
-              groupedLogs.map((group, idx) => (
-                <LogGroup key={idx} group={group} defaultOpen={true} />
-              ))
-            ) : (
-              <div className="text-slate-500 italic p-4 text-center border border-dashed border-slate-800 rounded">
-                No dry run data available.
+          <div className="space-y-2 font-mono text-sm text-slate-300 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar bg-slate-900/50 p-2 rounded border border-slate-800">
+            {groupedLogs.map((group, idx) => (
+              <div key={idx} className="mb-2">
+                <div className="font-bold text-blue-400 mb-1">
+                  {group.title}
+                </div>
+                {group.items.map((it, i) => (
+                  <div
+                    key={i}
+                    className="pl-2 border-l border-slate-700 text-xs py-0.5"
+                  >
+                    {it}
+                  </div>
+                ))}
               </div>
-            )}
-          </div>
-        );
-      };
-
-      const LogGroup = ({ group, defaultOpen }) => {
-        const [isOpen, setIsOpen] = useState(defaultOpen);
-        const isPass = group.title && group.title.includes("Pass");
-
-        if (group.items.length === 0) {
-          return (
-            <div
-              className={`p-3 rounded break-words border-l-2 bg-slate-900/50 border-slate-700 mb-2`}
-            >
-              <span className={isPass ? "text-blue-300 font-bold" : ""}>
-                {group.title}
-              </span>
-            </div>
-          );
-        }
-
-        return (
-          <div className="mb-2 border border-slate-800 rounded bg-slate-900/30 overflow-hidden">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className={`w-full flex items-center justify-between p-3 text-left transition-colors ${
-                isOpen
-                  ? "bg-slate-800/80"
-                  : "bg-slate-900 hover:bg-slate-800/50"
-              }`}
-            >
-              <span
-                className={`font-bold text-sm ${
-                  isPass ? "text-blue-400" : "text-slate-300"
-                }`}
-              >
-                {group.title}
-              </span>
-              {isOpen ? (
-                <ChevronDown size={14} className="text-slate-500" />
-              ) : (
-                <ChevronRight size={14} className="text-slate-500" />
-              )}
-            </button>
-            {isOpen && (
-              <div className="p-3 bg-slate-950/50 border-t border-slate-800 space-y-1.5">
-                {group.items.map((item, i) => {
-                  const isSwap =
-                    typeof item === "string" && item.includes("swap");
-                  const isResultLog =
-                    typeof item === "string" && item.includes("Result");
-                  return (
-                    <div
-                      key={i}
-                      className={`pl-3 border-l-2 text-xs flex gap-2 ${
-                        isSwap
-                          ? "border-yellow-500/50 text-yellow-100"
-                          : isResultLog
-                          ? "border-green-500/50 text-green-100 font-semibold mt-2"
-                          : "border-slate-700 text-slate-400"
-                      }`}
-                    >
-                      <span className="opacity-50 select-none">{i + 1}.</span>
-                      <span>{item}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+            ))}
           </div>
         );
       };
 
       // =========================================
-      // 5. VIEW COMPONENTS
+      // 3. DOMAIN VIEWS
       // =========================================
+
+      // --- REACT VIEW ---
       const ReactDetail = ({ question, onBack }) => {
-        useEffect(() => {
-          updateURL({ id: question.id.toString() });
-        }, [question.id]);
+        useEffect(() => updateURL({ id: question.id }), [question.id]);
         return (
-          <div className="p-4 md:p-8 bg-[#1e293b] rounded-xl shadow-2xl border border-slate-700 animation-fade-in">
+          <div className="p-6 bg-[#1e293b] rounded-xl border border-slate-700 animation-fade-in">
             <button
               onClick={onBack}
-              className="mb-6 text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-2 group"
+              className="mb-4 text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-2"
             >
-              <div className="p-1 rounded-full bg-blue-500/10 group-hover:bg-blue-500/20 transition">
-                <ChevronLeft size={16} />
-              </div>{" "}
-              Back to List
+              <ChevronLeft size={16} /> Back
             </button>
-            <div className="border-b border-slate-700 pb-4 mb-6">
-              <h1 className="text-2xl md:text-3xl font-extrabold text-white mb-3">
-                <span className="text-blue-500">Q{question.id}:</span>{" "}
-                {question.title}
-              </h1>
-              <span className="bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wide border border-blue-500/20">
-                {question.category}
-              </span>
+            <h1 className="text-2xl font-bold text-white mb-2">
+              <span className="text-blue-500">Q{question.id}:</span>{" "}
+              {question.title}
+            </h1>
+            <span className="bg-blue-500/10 text-blue-400 px-2 py-1 rounded text-xs border border-blue-500/20">
+              {question.category}
+            </span>
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold text-white mb-2">
+                Explanation
+              </h3>
+              <SyntaxHighLighter
+                codeString={question.explanation}
+                language="text"
+              />
+              <h3 className="text-lg font-semibold text-white mt-4 mb-2">
+                Code
+              </h3>
+              <SyntaxHighLighter
+                codeString={question.codeString}
+                language="jsx"
+              />
             </div>
-            <h3 className="text-lg font-semibold text-white mt-8 mb-2 flex items-center gap-2">
-              📝 Explanation
-            </h3>
-            <SyntaxHighLighter
-              codeString={question.explanation}
-              language="text"
-            />
-            <h3 className="text-lg font-semibold text-white mt-8 mb-2 flex items-center gap-2">
-              💡 Interview Tips
-            </h3>
-            <SyntaxHighLighter codeString={question.tips} language="text" />
-            <h3 className="text-lg font-semibold text-white mt-8 mb-2 flex items-center gap-2">
-              💻 Code Snippet
-            </h3>
-            <SyntaxHighLighter
-              codeString={question.codeString}
-              language="jsx"
-            />
-            {question.output && (
-              <>
-                <h3 className="text-lg font-semibold text-white mt-8 mb-2 flex items-center gap-2">
-                  ✅ Expected Output
-                </h3>
-                <SyntaxHighLighter output={question.output} />
-              </>
-            )}
           </div>
         );
       };
 
       const ReactView = ({ initialId }) => {
-        const [search, setSearch] = useState("");
-        const [category, setCategory] = useState("All");
-        const [sortBy, setSortBy] = useState("id");
-        const [sortOrder, setSortOrder] = useState("asc");
-        const [selectedQuestion, setSelectedQuestion] = useState(null);
-
-        // Calculate categories
-        const categories = useMemo(
-          () => ["All", ...new Set(reactQuestionsData.map((q) => q.category))],
-          []
-        );
+        const [selected, setSelected] = useState(null);
+        // Safely fallback if reactQuestionsData is missing
+        const data = reactQuestionsData || [];
 
         useEffect(() => {
-          if (initialId) {
-            const found = reactQuestionsData.find(
-              (q) => q.id.toString() === initialId
-            );
-            if (found) setSelectedQuestion(found);
-          }
-        }, [initialId]);
+          if (initialId && data.length)
+            setSelected(data.find((q) => q.id.toString() === initialId));
+        }, [initialId, data]);
 
-        const handleBack = () => {
-          setSelectedQuestion(null);
-          updateURL({ id: null });
-        };
-
-        // Logic for filtering and sorting
-        const filteredData = useMemo(() => {
-          let data = reactQuestionsData.filter((q) => {
-            const matchSearch =
-              q.title.toLowerCase().includes(search.toLowerCase()) ||
-              q.explanation.toLowerCase().includes(search.toLowerCase());
-            const matchCat = category === "All" || q.category === category;
-            return matchSearch && matchCat;
-          });
-
-          return data.sort((a, b) => {
-            let valA = a[sortBy];
-            let valB = b[sortBy];
-            if (typeof valA === "string") valA = valA.toLowerCase();
-            if (typeof valB === "string") valB = valB.toLowerCase();
-
-            if (valA < valB) return sortOrder === "asc" ? -1 : 1;
-            if (valA > valB) return sortOrder === "asc" ? 1 : -1;
-            return 0;
-          });
-        }, [search, category, sortBy, sortOrder]);
-
-        const handleReset = () => {
-          setSearch("");
-          setCategory("All");
-          setSortBy("id");
-          setSortOrder("asc");
-        };
-
-        if (selectedQuestion)
+        if (selected)
           return (
-            <ReactDetail question={selectedQuestion} onBack={handleBack} />
+            <ReactDetail
+              question={selected}
+              onBack={() => {
+                setSelected(null);
+                updateURL({ id: null });
+              }}
+            />
           );
 
         return (
           <div className="animation-fade-in">
-            <header className="mb-8 text-center md:text-left">
-              <h2 className="text-3xl font-bold text-white mb-2 flex items-center justify-center md:justify-start gap-3">
-                <span className="bg-blue-500/20 p-2 rounded-lg text-2xl">
-                  ⚛️
-                </span>{" "}
-                React Concepts
-              </h2>
-              <p className="text-slate-400 max-w-2xl">
-                Master the Virtual DOM, Hooks, Lifecycle methods, and component
-                patterns.
-              </p>
-            </header>
-
-            {/* FILTER BAR */}
-            <div className="bg-slate-800/50 p-5 rounded-xl border border-slate-700 shadow-lg mb-6">
-              <div className="mb-4 relative">
-                <span className="absolute left-3 top-3 text-slate-500">🔍</span>
-                <input
-                  placeholder="Search keywords..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 text-white py-2 pl-10 pr-4 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-600"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="flex flex-col">
-                  <label className="text-xs text-slate-500 mb-1 ml-1 font-bold">
-                    Category
-                  </label>
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="dark-select w-full bg-slate-900 border border-slate-700 text-white py-2 px-3 rounded-lg text-sm focus:border-blue-500 outline-none"
-                  >
-                    {categories.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex flex-col">
-                  <label className="text-xs text-slate-500 mb-1 ml-1 font-bold">
-                    Sort By
-                  </label>
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
-                    className="dark-select w-full bg-slate-900 border border-slate-700 text-white py-2 px-3 rounded-lg text-sm focus:border-blue-500 outline-none"
-                  >
-                    <option value="id">ID</option>
-                    <option value="title">Title</option>
-                  </select>
-                </div>
-                <div className="flex flex-col">
-                  <label className="text-xs text-slate-500 mb-1 ml-1 font-bold">
-                    Order
-                  </label>
-                  <select
-                    value={sortOrder}
-                    onChange={(e) => setSortOrder(e.target.value)}
-                    className="dark-select w-full bg-slate-900 border border-slate-700 text-white py-2 px-3 rounded-lg text-sm focus:border-blue-500 outline-none"
-                  >
-                    <option value="asc">Ascending</option>
-                    <option value="desc">Descending</option>
-                  </select>
-                </div>
-                <div className="flex items-end">
-                  <button
-                    onClick={handleReset}
-                    className="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 py-2 rounded-lg font-bold text-sm transition border border-slate-600"
-                  >
-                    Reset Filters
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="mb-4 text-xs text-slate-500 font-mono text-right">
-              Showing{" "}
-              <span className="text-blue-400 font-bold">
-                {filteredData.length}
-              </span>{" "}
-              result(s)
-            </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredData.length > 0 ? (
-                filteredData.map((q) => (
-                  <QuestionCard
-                    key={q.id}
-                    {...q}
-                    onClick={() => setSelectedQuestion(q)}
-                  />
-                ))
-              ) : (
-                <div className="col-span-full text-center p-10 border-2 border-dashed border-slate-800 rounded-xl text-slate-500">
-                  No matching questions found.
-                </div>
-              )}
+              {data.map((q) => (
+                <UniversalCard
+                  key={q.id}
+                  id={q.id}
+                  title={q.title}
+                  subtitle={q.explanation}
+                  category={q.category}
+                  onClick={() => setSelected(q)}
+                />
+              ))}
             </div>
+            {data.length === 0 && (
+              <div className="text-center text-slate-500 py-10">
+                No React data loaded. Ensure data.js is linked.
+              </div>
+            )}
           </div>
         );
       };
 
+      // --- DSA VIEW ---
       const DSADetail = ({ item, onBack }) => {
-        const [inputStr, setInputStr] = useState("[13, 24, 46, 20, 9, 52]");
-        const [dynamicLogs, setDynamicLogs] = useState(null);
-        const [error, setError] = useState(null);
-        const [isEditing, setIsEditing] = useState(false);
-        const hasImplementation = typeof item?.dryRunFunc === "function";
-
-        useEffect(() => {
-          updateURL({ id: item.id.toString() });
-        }, [item.id]);
-        useEffect(() => {
-          setDynamicLogs(null);
-          setError(null);
-          setIsEditing(false);
-          if (item?.id === "bubble-sort")
-            setInputStr("[13, 24, 46, 20, 9, 52]");
-        }, [item?.id]);
+        const [logs, setLogs] = useState(null);
+        useEffect(() => updateURL({ id: item.id }), [item.id]);
 
         const handleRun = () => {
-          if (!hasImplementation) return;
-          try {
-            setError(null);
-            const parsedInput = JSON.parse(inputStr);
-            if (!Array.isArray(parsedInput))
-              throw new Error("Input must be an array");
-            const logs = item.dryRunFunc(parsedInput);
-            setDynamicLogs(logs);
-          } catch (err) {
-            setError("Invalid Format: " + err.message);
+          if (item.dryRunFunc) {
+            try {
+              setLogs(item.dryRunFunc([10, 5, 3, 8, 2]));
+            } catch (e) {
+              console.error(e);
+            }
           }
         };
 
-        const logsToDisplay = dynamicLogs || item?.dryRun || [];
-
         return (
-          <div className="p-4 md:p-8 bg-[#1e293b] rounded-xl shadow-2xl border border-slate-700 animation-fade-in">
+          <div className="p-6 bg-[#1e293b] rounded-xl border border-slate-700 animation-fade-in">
             <button
               onClick={onBack}
-              className="mb-6 text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-2 group"
+              className="mb-4 text-purple-400 font-semibold flex items-center gap-2"
             >
-              <div className="p-1 rounded-full bg-blue-500/10 group-hover:bg-blue-500/20 transition">
-                <ChevronLeft size={16} />
-              </div>{" "}
-              Back to List
+              <ChevronLeft size={16} /> Back
             </button>
-            <div className="border-b border-slate-700 pb-6 mb-6">
-              <h1 className="text-3xl font-bold text-white mb-2">
-                {item?.title}
-              </h1>
-              <div className="flex flex-wrap gap-4 text-sm font-mono text-slate-400">
-                <span className="bg-blue-900/30 text-blue-400 px-3 py-1 rounded border border-blue-500/30">
-                  {item?.category}
-                </span>
-                <span className="flex items-center gap-1 text-green-400">
-                  ⏱ {item?.timeComplexity}
-                </span>
-                <span className="flex items-center gap-1 text-purple-400">
-                  💾 {item?.spaceComplexity}
-                </span>
-              </div>
+            <h1 className="text-2xl font-bold text-white">{item.title}</h1>
+            <div className="flex gap-3 text-sm font-mono text-slate-400 mt-2 mb-6">
+              <span className="text-green-400">⏱ {item.timeComplexity}</span>
+              <span className="text-purple-400">💾 {item.spaceComplexity}</span>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full overflow-hidden">
-              <div className="lg:col-span-2 space-y-8">
-                <section>
-                  <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-                    🧠 Algorithm Logic
-                  </h3>
-                  <p className="text-slate-300 leading-relaxed bg-slate-800/30 p-4 rounded-lg border border-slate-700/50 break-words">
-                    {item?.algorithm}
-                  </p>
-                </section>
-                <section>
-                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end mb-3 gap-3">
-                    <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                      🏃 Dry Run{" "}
-                      {dynamicLogs && (
-                        <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded ml-2">
-                          Dynamic
-                        </span>
-                      )}
-                    </h3>
-                    {hasImplementation && (
-                      <button
-                        onClick={() => setIsEditing(!isEditing)}
-                        className="text-xs flex items-center gap-1 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 px-3 py-1.5 rounded transition w-fit"
-                      >
-                        {isEditing ? "Cancel" : "Edit Input"}
-                      </button>
-                    )}
+            <div className="grid lg:grid-cols-2 gap-6">
+              <div>
+                <h3 className="font-bold text-white mb-2">Algorithm</h3>
+                <p className="text-slate-300 text-sm mb-4">{item.algorithm}</p>
+                <button
+                  onClick={handleRun}
+                  className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded text-sm font-bold flex items-center gap-2"
+                >
+                  <Play size={14} /> Run Demo
+                </button>
+                {logs && (
+                  <div className="mt-4">
+                    <LogViewer logs={logs} />
                   </div>
-                  {isEditing ? (
-                    <div className="bg-slate-900 p-4 rounded-lg border border-blue-500/50 mb-4 animation-fade-in">
-                      <label className="block text-xs text-slate-400 mb-2 font-mono uppercase">
-                        Input Array (JSON format)
-                      </label>
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={inputStr}
-                          onChange={(e) => setInputStr(e.target.value)}
-                          className="flex-1 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-sm font-mono text-white focus:border-blue-500 outline-none"
-                        />
-                        <button
-                          onClick={handleRun}
-                          className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded text-sm font-bold flex items-center gap-2 transition"
-                        >
-                          <Play size={14} /> Run
-                        </button>
-                      </div>
-                      {error && (
-                        <div className="flex items-center gap-2 mt-2 text-red-400 text-xs">
-                          <AlertCircle size={12} /> {error}
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <input
-                      type="text"
-                      value={inputStr}
-                      readOnly
-                      className="w-full mb-2 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-sm font-mono text-gray-500 outline-none cursor-default opacity-50"
-                      title="Click 'Edit Input' to change"
-                    />
-                  )}
-                  <LogViewer logs={logsToDisplay} />
-                  {dynamicLogs && (
-                    <button
-                      onClick={() => setDynamicLogs(null)}
-                      className="mt-4 text-xs text-slate-500 hover:text-white flex items-center gap-1 mx-auto"
-                    >
-                      <RotateCcw size={12} /> Reset to Default
-                    </button>
-                  )}
-                </section>
-                <section className="grid sm:grid-cols-2 gap-4">
-                  <div className="bg-red-900/10 border border-red-900/30 p-4 rounded-lg">
-                    <h4 className="text-red-400 font-bold mb-2 text-sm flex items-center gap-2">
-                      ⚠️ EDGE CASES
-                    </h4>
-                    <ul className="list-disc pl-4 text-slate-400 text-sm space-y-1">
-                      {item?.edgeCases?.map((e, i) => (
-                        <li key={i}>{e}</li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="bg-yellow-900/10 border border-yellow-900/30 p-4 rounded-lg">
-                    <h4 className="text-yellow-400 font-bold mb-2 text-sm flex items-center gap-2">
-                      💡 TIPS
-                    </h4>
-                    <ul className="list-disc pl-4 text-slate-400 text-sm space-y-1">
-                      {item?.tips?.map((t, i) => (
-                        <li key={i}>{t}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </section>
+                )}
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-white mb-3">
-                  Implementation
-                </h3>
-                <div className="sticky top-6">
-                  <SyntaxHighLighter codeString={item?.code} />
-                </div>
+                <SyntaxHighLighter codeString={item.code} />
               </div>
             </div>
           </div>
@@ -927,108 +512,35 @@
       };
 
       const DSAView = ({ initialId }) => {
-        const [search, setSearch] = useState("");
-        const [category, setCategory] = useState("All");
         const [selected, setSelected] = useState(null);
-        const categories = useMemo(
-          () => ["All", ...new Set(dsaAlgorithms.map((a) => a.category))],
-          []
-        );
+        const data = dsaAlgorithms || [];
 
         useEffect(() => {
-          if (initialId) {
-            const found = dsaAlgorithms.find(
-              (item) => item.id.toString() === initialId
-            );
-            if (found) setSelected(found);
-          }
-        }, [initialId]);
+          if (initialId && data.length)
+            setSelected(data.find((i) => i.id.toString() === initialId));
+        }, [initialId, data]);
 
-        const handleBack = () => {
-          setSelected(null);
-          updateURL({ id: null });
-        };
-
-        const filtered = useMemo(() => {
-          return dsaAlgorithms.filter((item) => {
-            const matchSearch =
-              item.title.toLowerCase().includes(search.toLowerCase()) ||
-              item.algorithm.toLowerCase().includes(search.toLowerCase());
-            const matchCat = category === "All" || item.category === category;
-            return matchSearch && matchCat;
-          });
-        }, [search, category]);
-
-        if (selected) return <DSADetail item={selected} onBack={handleBack} />;
+        if (selected)
+          return (
+            <DSADetail
+              item={selected}
+              onBack={() => {
+                setSelected(null);
+                updateURL({ id: null });
+              }}
+            />
+          );
 
         return (
           <div className="animation-fade-in">
-            <header className="mb-8 text-center md:text-left">
-              <h2 className="text-3xl font-bold text-white mb-2 flex items-center justify-center md:justify-start gap-3">
-                <span className="bg-purple-500/20 p-2 rounded-lg text-2xl">
-                  🧠
-                </span>{" "}
-                Algorithms
-              </h2>
-              <p className="text-slate-400 max-w-2xl">
-                Your quick reference guide for complexity analysis, edge cases,
-                and dry run logic.
-              </p>
-            </header>
-            <div className="bg-slate-800/50 p-5 rounded-xl border border-slate-700 shadow-lg mb-6">
-              <div className="flex flex-wrap gap-3">
-                <div className="flex-1 min-w-[200px] relative">
-                  <span className="absolute left-3 top-3 text-slate-500">
-                    🔍
-                  </span>
-                  <input
-                    placeholder="Search algorithms..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 text-white p-2.5 pl-10 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-600"
-                  />
-                </div>
-                <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  className="dark-select bg-slate-900 border border-slate-700 text-white p-2.5 pr-10 rounded-lg min-w-[150px] focus:border-blue-500 outline-none"
-                >
-                  {categories.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  onClick={() => {
-                    setSearch("");
-                    setCategory("All");
-                    setSelected(null);
-                  }}
-                  className="px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-700 rounded-lg font-medium transition"
-                >
-                  Reset
-                </button>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-10">
-              {filtered.map((item) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {data.map((item) => (
                 <UniversalCard
                   key={item.id}
                   id={item.id}
                   title={item.title}
                   subtitle={item.algorithm}
                   category={item.category}
-                  meta={
-                    <>
-                      <span className="text-green-400">
-                        ⏱ {item.timeComplexity}
-                      </span>
-                      <span className="text-purple-400">
-                        💾 {item.spaceComplexity}
-                      </span>
-                    </>
-                  }
                   onClick={() => setSelected(item)}
                 />
               ))}
@@ -1037,68 +549,213 @@
         );
       };
 
+      // --- SYSTEM DESIGN VIEW ---
+      const DesignDetail = ({ item, onBack }) => {
+        useEffect(() => updateURL({ id: item.id }), [item.id]);
+        return (
+          <div className="p-6 bg-[#1e293b] rounded-xl border border-slate-700 animation-fade-in">
+            <button
+              onClick={onBack}
+              className="mb-4 text-emerald-400 font-semibold flex items-center gap-2"
+            >
+              <ChevronLeft size={16} /> Back
+            </button>
+            <h1 className="text-2xl font-bold text-white">{item.title}</h1>
+            <div className="mt-6 space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-2">
+                  📐 Concept
+                </h3>
+                <SyntaxHighLighter
+                  codeString={item.explanation}
+                  language="text"
+                />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-2">
+                  💡 Pro Tips
+                </h3>
+                <SyntaxHighLighter codeString={item.tips} language="text" />
+              </div>
+              {item.codeString && (
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-2">
+                    💻 Implementation
+                  </h3>
+                  <SyntaxHighLighter codeString={item.codeString} />
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      };
+
+      const DesignView = ({ initialId }) => {
+        const [selected, setSelected] = useState(null);
+        useEffect(() => {
+          if (initialId)
+            setSelected(DesignData.find((d) => d.id.toString() === initialId));
+        }, [initialId]);
+
+        if (selected)
+          return (
+            <DesignDetail
+              item={selected}
+              onBack={() => {
+                setSelected(null);
+                updateURL({ id: null });
+              }}
+            />
+          );
+
+        return (
+          <div className="animation-fade-in grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {DesignData.map((item) => (
+              <UniversalCard
+                key={item.id}
+                id={item.id}
+                title={item.title}
+                subtitle={item.explanation}
+                category={item.category}
+                onClick={() => setSelected(item)}
+              />
+            ))}
+          </div>
+        );
+      };
+
+      // =========================================
+      // 4. MAIN LAYOUT
+      // =========================================
       const InterviewExplorer = () => {
         const [activeTab, setActiveTab] = useState("dsa");
         const [initialId, setInitialId] = useState(null);
+        const tabsRef = useRef(null);
+        const [canScrollLeft, setCanScrollLeft] = useState(false);
+        const [canScrollRight, setCanScrollRight] = useState(false);
 
+        // Parse URL on mount
         useEffect(() => {
-          const params = new URLSearchParams(window.location.search);
-          const tabParam = params.get("tab");
-          const idParam = params.get("id");
-          if (tabParam === "react" || tabParam === "dsa")
-            setActiveTab(tabParam);
-          if (idParam) setInitialId(idParam);
+          const params = new URLSearchParams(location.search);
+          const t = params.get("tab");
+          const i = params.get("id");
+          if (t) setActiveTab(t);
+          if (i) setInitialId(i);
+          checkScroll();
+          addEventListener("resize", checkScroll);
+          return () => removeEventListener("resize", checkScroll);
         }, []);
 
-        const handleTabChange = (tab) => {
-          setActiveTab(tab);
-          updateURL({ tab, id: null });
+        const checkScroll = () => {
+          if (tabsRef.current) {
+            const { scrollLeft, scrollWidth, clientWidth } = tabsRef.current;
+            setCanScrollLeft(scrollLeft > 0);
+            setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1);
+          }
+        };
+
+        const scrollTabs = (dir) => {
+          if (tabsRef.current) {
+            tabsRef.current.scrollBy({ left: dir * 200, behavior: "smooth" });
+            setTimeout(checkScroll, 300);
+          }
+        };
+
+        const handleTabChange = (id) => {
+          setActiveTab(id);
+          updateURL({ tab: id, id: null });
           setInitialId(null);
         };
 
         return (
-          <div className="min-h-screen flex flex-col">
-            <nav className="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50 px-4 py-4 shadow-lg">
+          <div className="min-h-screen flex flex-col bg-slate-950 text-slate-200 font-sans">
+            <nav className="bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/60 sticky top-0 z-50 px-4 py-4">
               <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="bg-gradient-to-br from-blue-600 to-purple-600 p-2 rounded-lg shadow-lg shadow-blue-500/20">
+                <div className="flex items-center gap-3 group cursor-pointer">
+                  <div className="relative bg-gradient-to-br from-blue-600 to-indigo-600 p-2.5 rounded-xl shadow-lg border border-white/10">
                     <span className="text-white font-bold text-xl">🚀</span>
                   </div>
-                  <h1 className="text-xl font-bold text-white tracking-tight">
-                    Fullstack<span className="text-blue-400">Prep</span>Hub
-                  </h1>
+                  <div>
+                    <h1 className="text-xl font-bold text-white tracking-tight">
+                      Fullstack<span className="text-blue-400">Prep</span>
+                    </h1>
+                    <p className="text-[10px] text-slate-500 font-mono tracking-widest uppercase">
+                      Mastery Hub
+                    </p>
+                  </div>
                 </div>
-                <div className="flex gap-2 p-1 bg-slate-950 rounded-xl border border-slate-800">
-                  <button
-                    onClick={() => handleTabChange("react")}
-                    className={`px-6 py-2 rounded-lg font-bold text-sm transition-all duration-300 ${
-                      activeTab === "react"
-                        ? "bg-slate-800 text-blue-400 shadow-lg border border-slate-700"
-                        : "text-slate-400 hover:text-slate-200"
-                    }`}
+
+                {/* SCROLLABLE NAVIGATION */}
+                <div className="relative group/nav flex items-center max-w-full md:max-w-xl">
+                  {canScrollLeft && (
+                    <button
+                      onClick={() => scrollTabs(-1)}
+                      className="absolute left-0 z-10 p-2 bg-gradient-to-r from-slate-950 via-slate-950 to-transparent h-full flex items-center"
+                    >
+                      <ChevronLeft
+                        className="bg-slate-800 rounded-full p-1 shadow-lg border border-slate-700"
+                        size={20}
+                      />
+                    </button>
+                  )}
+
+                  <div
+                    ref={tabsRef}
+                    onScroll={checkScroll}
+                    className="flex p-1.5 bg-slate-900/80 rounded-2xl border border-slate-800/80 backdrop-blur-sm overflow-x-auto no-scrollbar scroll-smooth gap-2 w-full"
                   >
-                    React & JS
-                  </button>
-                  <button
-                    onClick={() => handleTabChange("dsa")}
-                    className={`px-6 py-2 rounded-lg font-bold text-sm transition-all duration-300 ${
-                      activeTab === "dsa"
-                        ? "bg-slate-800 text-purple-400 shadow-lg border border-slate-700"
-                        : "text-slate-400 hover:text-slate-200"
-                    }`}
-                  >
-                    DSA Cheatsheet
-                  </button>
+                    {[
+                      { id: "react", label: "React & JS", icon: "⚛️" },
+                      { id: "dsa", label: "Algorithms", icon: "🧠" },
+                      { id: "design", label: "System Design", icon: "📐" },
+                      // { id: "patterns", label: "Patterns", icon: "🎯" },
+                    ].map((tab) => {
+                      const isActive = activeTab === tab.id;
+                      return (
+                        <button
+                          key={tab.id}
+                          onClick={() => handleTabChange(tab.id)}
+                          className={`relative px-5 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 ease-out flex items-center gap-2 whitespace-nowrap shrink-0 ${
+                            isActive
+                              ? "text-white shadow-md bg-slate-800 ring-1 ring-white/10"
+                              : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
+                          }`}
+                        >
+                          <span>{tab.icon}</span>
+                          <span>{tab.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {canScrollRight && (
+                    <button
+                      onClick={() => scrollTabs(1)}
+                      className="absolute right-0 z-10 p-2 bg-gradient-to-l from-slate-950 via-slate-950 to-transparent h-full flex items-center"
+                    >
+                      <ChevronRight
+                        className="bg-slate-800 rounded-full p-1 shadow-lg border border-slate-700"
+                        size={20}
+                      />
+                    </button>
+                  )}
                 </div>
               </div>
             </nav>
+
             <main className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-8">
-              {activeTab === "react" ? (
-                <ReactView initialId={initialId} />
-              ) : (
-                <DSAView initialId={initialId} />
-              )}
+              <div key={activeTab} className="animate-tab-content h-full">
+                {activeTab === "react" && <ReactView initialId={initialId} />}
+                {activeTab === "dsa" && <DSAView initialId={initialId} />}
+                {activeTab === "design" && <DesignView initialId={initialId} />}
+                {activeTab === "patterns" && (
+                  <div className="text-center p-10 text-slate-500 border-2 border-dashed border-slate-800 rounded-xl">
+                    Patterns Coming Soon
+                  </div>
+                )}
+              </div>
             </main>
+
             <footer className="border-t border-slate-800 py-8 mt-auto">
               <div className="max-w-7xl mx-auto px-4 text-center text-slate-500 text-sm">
                 <p>
