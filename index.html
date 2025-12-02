@@ -180,99 +180,79 @@
         }
       };
 
-      const SyntaxHighLighter = ({
+      const CodeBlock = ({
         codeString = "",
-        language = "javascript",
         output = null,
+        isExplanation = false,
       }) => {
-        const [copied, setCopied] = useState(false);
         const [isDark, setIsDark] = useState(true);
+        const bgColor = isDark ? "bg-gray-800" : "bg-white border-gray-300";
+        const textColor = isDark ? "text-white" : "text-gray-900";
+        const headerBg = isDark ? "bg-gray-700" : "bg-gray-200";
+        const buttonStyle = isDark
+          ? "border-gray-600 text-white hover:bg-gray-600"
+          : "border-gray-400 text-gray-800 hover:bg-gray-300";
 
-        useEffect(() => {
-          if (Prism) Prism.highlightAll();
-        }, [codeString, isDark]);
-
-        const handleCopy = async () => {
-          await navigator.clipboard.writeText(codeString || output || "");
-          setCopied(true);
-          setTimeout(() => setCopied(false), 1500);
+        const handleCopy = () => {
+          // Using document.execCommand('copy') for robust clipboard access in various environments
+          const el = document.createElement("textarea");
+          el.value = codeString || output;
+          document.body.appendChild(el);
+          el.select();
+          try {
+            document.execCommand("copy");
+          } catch (err) {
+            console.error("Failed to copy text: ", err);
+          }
+          document.body.removeChild(el);
         };
 
         return (
           <div
-            style={{
-              position: "relative",
-              borderRadius: 8,
-              overflow: "hidden",
-              fontFamily: "monospace",
-              marginTop: 10,
-              marginBottom: 10,
-              border: isDark ? "1px solid #334155" : "1px solid #ccc",
-              backgroundColor: isDark ? "#2d2d2d" : "#f5f5f5",
-              color: isDark ? "#fff" : "#000",
-            }}
+            className={`${bgColor} ${textColor} rounded-lg overflow-hidden my-4 shadow-lg border ${
+              isDark ? "border-gray-700" : "border-gray-300"
+            }`}
           >
             <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "6px 12px",
-                background: isDark ? "#1e1e1e" : "#e6e6e6",
-                borderBottom: isDark ? "1px solid #333" : "1px solid #ddd",
-                fontSize: 13,
-              }}
+              className={`${headerBg} flex justify-between items-center p-2 text-sm`}
             >
-              <span style={{ fontWeight: "bold", opacity: 0.8 }}>
-                {language.toUpperCase()}
+              <span className="font-mono opacity-80">
+                {isExplanation ? "TEXT" : "JAVASCRIPT"}
               </span>
-              <div style={{ display: "flex" }}>
+              <div className="flex space-x-2">
                 <button
                   onClick={handleCopy}
-                  style={{
-                    background: "transparent",
-                    border: `1px solid ${isDark ? "#666" : "#999"}`,
-                    padding: "2px 8px",
-                    borderRadius: 4,
-                    cursor: "pointer",
-                    fontSize: 12,
-                    color: isDark ? "#fff" : "#333",
-                  }}
+                  className={`px-2 py-1 text-xs rounded border ${buttonStyle} transition`}
                 >
-                  {copied ? "✅" : "📋"}
+                  📋 Copy
+                </button>
+                <button
+                  onClick={() => setIsDark(!isDark)}
+                  className={`px-2 py-1 text-xs rounded border ${buttonStyle} transition`}
+                >
+                  {isDark ? "🌞 Light" : "🌙 Dark"}
                 </button>
               </div>
             </div>
+
             {codeString && (
-              <div
-                style={{ padding: "16px", overflowX: "auto", fontSize: "14px" }}
-              >
-                <pre className={`language-${language}`} style={{ margin: 0 }}>
-                  <code>{codeString.trim()}</code>
-                </pre>
-              </div>
+              <pre className="p-4 overflow-x-auto text-sm leading-relaxed">
+                <code style={{ whiteSpace: "pre-wrap" }}>
+                  {codeString.trim()}
+                </code>
+              </pre>
             )}
+
             {output && (
               <div
-                style={{
-                  background: isDark ? "#1e1e1e" : "#fafafa",
-                  color: isDark ? "#00ff88" : "#333",
-                  padding: "12px",
-                  borderTop: isDark ? "1px solid #444" : "1px solid #ddd",
-                  fontSize: "12px",
-                  overflowX: "auto",
-                }}
+                className={`p-3 border-t ${
+                  isDark
+                    ? "border-gray-700 bg-gray-900 text-green-400"
+                    : "border-gray-300 bg-gray-50 text-gray-700"
+                } text-sm`}
               >
-                <strong
-                  style={{
-                    display: "block",
-                    marginBottom: 6,
-                    color: isDark ? "#4ade80" : "#15803d",
-                  }}
-                >
-                  Output:
-                </strong>
-                <pre style={{ margin: 0 }}>{output}</pre>
+                <strong className="font-semibold">Console Output:</strong>
+                <pre className="m-0 text-xs font-mono">{output}</pre>
               </div>
             )}
           </div>
@@ -411,17 +391,11 @@
               <h3 className="text-lg font-semibold text-white mb-2">
                 Explanation
               </h3>
-              <SyntaxHighLighter
-                codeString={question.explanation}
-                language="text"
-              />
+              <CodeBlock codeString={question.explanation} language="text" />
               <h3 className="text-lg font-semibold text-white mt-4 mb-2">
                 Code
               </h3>
-              <SyntaxHighLighter
-                codeString={question.codeString}
-                language="jsx"
-              />
+              <CodeBlock codeString={question.codeString} language="jsx" />
             </div>
           </div>
         );
@@ -624,7 +598,7 @@
                 )}
               </div>
               <div>
-                <SyntaxHighLighter codeString={item.code} />
+                <CodeBlock codeString={item.code} />
               </div>
             </div>
           </div>
@@ -704,7 +678,7 @@
                 <h3 className="text-lg font-semibold text-white mb-2">
                   📐 Concept
                 </h3>
-                <SyntaxHighLighter
+                <CodeBlock
                   codeString={item.explanation}
                   language="text"
                 />
@@ -713,14 +687,14 @@
                 <h3 className="text-lg font-semibold text-white mb-2">
                   💡 Pro Tips
                 </h3>
-                <SyntaxHighLighter codeString={item.tips} language="text" />
+                <CodeBlock codeString={item.tips} language="text" />
               </div>
               {item.codeString && (
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-2">
                     💻 Implementation
                   </h3>
-                  <SyntaxHighLighter codeString={item.codeString} />
+                  <CodeBlock codeString={item.codeString} />
                 </div>
               )}
             </div>
